@@ -19,7 +19,7 @@ const AtisContainer: React.FC = () => {
             const response = await axios.get('/api/atis')
             setAtisData(response.data)
             console.log(atisData)
-        }, 60000)
+        }, 120000)
     }, [])
     
     const AtisMap = () => {
@@ -30,7 +30,7 @@ const AtisContainer: React.FC = () => {
                 list.push(<AtisDivider facility={atis.facility}/>)
             }
 
-            list.push(<Atis/>)
+            list.push(<Atis data={atis}/>)
         })
 
         return list
