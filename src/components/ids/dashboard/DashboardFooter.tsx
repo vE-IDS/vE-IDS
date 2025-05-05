@@ -30,7 +30,7 @@ const DashboardFooter: React.FC = () => {
                     <FooterButton disabled/>
                     <FooterButton disabled/>
                     <FooterButton disabled/>
-                    <FooterButton disabled/>
+                    <FooterButton text='Info Test' href='/ids/info/kmco'/>
                 </tr>
             </tbody>
         </table>

@@ -1,9 +1,10 @@
 import axios from "axios"
 import { VATSIMData } from "@/types/vatsim"
 import { ATIS } from "@/hooks/datafeed"
+import { unstable_cache } from "next/cache"
+import { NextResponse } from "next/server"
 
-export const GET = async(request: Request, response: Response) => {
-    console.log('ran')
+export const GET = async() => {
     // Get and parse VATSIM data feed
     const vatsimData = await axios.get<VATSIMData>('https://data.vatsim.net/v3/vatsim-data.json')
     
@@ -25,9 +26,11 @@ export const GET = async(request: Request, response: Response) => {
                 activeDepartures:  ['XXL', 'XXR'],
             }
         )
-    }
     
-        
+    }
 
-    return Response.json(atisDTOs)
+    return await Response.json(atisDTOs)
 }
+
+export const revalidate = 60
+export const fetchCache = 'force-cache'

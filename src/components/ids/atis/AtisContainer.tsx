@@ -32,11 +32,15 @@ const AtisContainer: React.FC = () => {
         return list
     }
 
+    if (datafeedStore.atisData.length == 0) {
+        return <div className='w-120 h-full flex justify-center items-center'>
+            <h2>ATIS Data Loading</h2>
+        </div>
+    }
+
     return (
-        <div className="bg-dark-gray w-max top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
-            <div className="">
-                <AtisMap/>
-            </div>
+        <div className="bg-dark-gray w-120 top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
+            <AtisMap/>
         </div>
     )
 }

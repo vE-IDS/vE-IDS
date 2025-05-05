@@ -14,3 +14,35 @@ datasource db {
   relationMode = "foreignKeys"
   url      = env("DATABASE_URL")
 }
+
+model ATIS {
+  atisId Int @id @default(autoincrement()) @db.UnsignedInt
+  airport String
+  information String?
+  metar String?
+  status String?
+  facility String
+  activeApproaches String
+  activeDepartures String
+  lastUpdated DateTime
+}
+
+/*
+model Aircraft {
+  aircraft_id       Int      @id @default(autoincrement()) @db.UnsignedInt
+  tail_number       String   @db.VarChar(20)
+  description       String?  @db.VarChar(500)
+  make              String?  @db.VarChar(50)
+  type_code         String   @db.VarChar(5)
+  model             String?  @db.VarChar(50)
+  engine_type       String   @db.VarChar(20)
+  number_of_engines Int
+  taa               Boolean?
+  complex           Boolean?
+  high_performance  Boolean?
+  user_id           Int      @db.UnsignedInt
+  logbook_entries   LogbookEntry[]
+
+  @@index([user_id], map: "aircraft_users_user_id_fk")
+  @@map("aircraft")
+}*/

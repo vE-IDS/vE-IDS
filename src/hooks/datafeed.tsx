@@ -10,6 +10,13 @@ export const updateDatafeed = async() => {
     useDatafeedStore.setState((state) => state.atisData = response.data)
 }
 
+export const setAtis = async(data: ATIS[]) => {
+    useDatafeedStore.setState((state) => {
+        state.atisData = data
+        return state
+    })
+}
+
 export default useDatafeedStore
 
 interface DatafeedStore {

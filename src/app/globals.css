@@ -89,7 +89,7 @@
   }
 
   .panel {
-    @apply h-full w-full overflow-y-scroll z-20 
+    @apply h-full w-full overflow-y-scroll z-20
   }
 }
 

@@ -1,6 +1,5 @@
-'use client'
 import AtisContainer from "@/components/ids/atis/AtisContainer"
-import DashboardFooter from "@/components/ids/DashboardFooter"
+import DashboardFooter from "@/components/ids/dashboard/DashboardFooter"
 import Navbar from "@/components/navbar/Navbar"
 
 const IDSLayout: React.FC<Props> = ({children}: Props) => {
