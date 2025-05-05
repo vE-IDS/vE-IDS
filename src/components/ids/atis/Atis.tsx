@@ -24,14 +24,14 @@ const Atis: React.FC<Props> = ({data}: Props) => {
                     <div>
                         <p className="font-bold mb-.5">Departing</p>
                         <div className="flex flex-row gap-x-2">
-                        {data.activeDepartures?.map((departure) => <p className="approach-box py-.5">{departure}</p>)}
+                        {data.activeDepartures?.map((departure, i) => <p className="approach-box py-.5" key={i}>{departure}</p>)}
                         </div>
                     </div>
 
                     <div>
                         <p className="font-bold mb-.5">Arriving</p>
                         <div className="flex flex-row gap-x-2">
-                            {data.activeApproaches?.map((arrival) => <p className="approach-box py-.5">{arrival}</p>)}
+                            {data.activeApproaches?.map((arrival, i) => <p className="approach-box py-.5" key={i}>{arrival}</p>)}
                         </div>
                     </div>
 

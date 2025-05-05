@@ -1,36 +1,32 @@
 'use client'
-import { ATIS } from "@/hooks/datafeed";
+import useDatafeedStore, { ATIS, updateDatafeed } from "@/hooks/datafeed";
 import axios from "axios";
 import { ReactNode, useEffect, useState } from "react";
 import AtisDivider from "./AtisDivider";
 import Atis from "./Atis";
 
 const AtisContainer: React.FC = () => {
-    const [atisData, setAtisData] = useState<ATIS[]>([])
+    const datafeedStore = useDatafeedStore()
 
     useEffect(() => {
-            axios.get('/api/atis').then((res) => {
-                setAtisData(res.data)
-            })
+            updateDatafeed()
     }, [])
 
     useEffect(() => {
         setInterval(async() => {
-            const response = await axios.get('/api/atis')
-            setAtisData(response.data)
-            console.log(atisData)
+            updateDatafeed()
         }, 120000)
     }, [])
     
     const AtisMap = () => {
         const list: ReactNode[] = []
 
-        atisData.map((atis, i) => {
-            if (i == 0 || atis.facility != atisData[i-1].facility) {
-                list.push(<AtisDivider facility={atis.facility}/>)
+        datafeedStore.atisData.map((atis, i) => {
+            if (i == 0 || atis.facility != datafeedStore.atisData[i-1].facility) {
+                list.push(<AtisDivider facility={atis.facility} key={i + 1000}/>)
             }
 
-            list.push(<Atis data={atis}/>)
+            list.push(<Atis data={atis} key={i}/>)
         })
 
         return list
@@ -38,11 +34,9 @@ const AtisContainer: React.FC = () => {
 
     return (
         <div className="bg-dark-gray w-max top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
-            <table className="">
-                <tbody>
-                        <AtisMap/>
-                </tbody>
-            </table>
+            <div className="">
+                <AtisMap/>
+            </div>
         </div>
     )
 }

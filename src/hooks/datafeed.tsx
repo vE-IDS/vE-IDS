@@ -1,19 +1,22 @@
+import axios from 'axios';
 import { create } from 'zustand'
-import { shallow } from 'zustand/shallow';
-import axios from "axios"
-import { VATSIMData } from "@/types/vatsim"
 
 const useDatafeedStore = create<DatafeedStore>((set) => ({
     atisData: [] as ATIS[],
 }));
 
-interface DatafeedStore {
-    atisData: ATIS[]
+export const updateDatafeed = async() => {
+    const response = await axios.get('/api/atis')
+    useDatafeedStore.setState((state) => state.atisData = response.data)
 }
 
 export default useDatafeedStore
 
-export type ATIS = {
+interface DatafeedStore {
+    atisData: ATIS[]
+}
+
+export interface ATIS {
     airport: string
     information?: string
     metar: string
@@ -21,4 +24,4 @@ export type ATIS = {
     facility: string
     activeApproaches?: string[]
     activeDepartures?: string[]
-  }
+}

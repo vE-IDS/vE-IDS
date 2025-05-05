@@ -10,9 +10,10 @@ export const GET = async(request: Request, response: Response) => {
     // Get data from aviationweather.gov and push to atisDTO
     const atisDTOs: ATIS[] = []
 
-    for (const atis of vatsimData.data.atis) {
+    for (const atis of vatsimData.data.atis.filter((data) => data.callsign.charAt(0) == 'K')) {
         const airport = atis.callsign.slice(0, 4)
         const metar = await axios.get<string>(`https://aviationweather.gov/api/data/metar`, {params: {ids: airport}, responseType: 'text'})
+
         atisDTOs.push(
             {
                 airport: airport,

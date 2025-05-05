@@ -13,7 +13,7 @@ const FooterButton: React.FC<Props> = ({text, disabled, href}: Props) => {
 export default FooterButton
 
 type Props = {
-    text: string
+    text?: string
     disabled?: boolean
     href?: string
 }

@@ -2,35 +2,35 @@ import FooterButton from "./FooterButton"
 
 const DashboardFooter: React.FC = () => {
     return (
-        <table className="w-max bg-dark-gray h-20 z-30">
+        <table className="w-max border-t-2 border-dark-gray bg-dark-gray h-20 z-30">
             <tbody>
                 <tr className="overflow-x-scroll">
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
                 </tr>
                 <tr className="overflow-x-scroll h-10">
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
-                    <FooterButton text="'DISABLED'" href="'/'" disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
+                    <FooterButton disabled/>
                 </tr>
             </tbody>
         </table>
