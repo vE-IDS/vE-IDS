@@ -19,9 +19,9 @@ const Atis: React.FC<Props> = ({data}: Props) => {
             </div>
 
             <div className="pl-5 w-100 relative z-0">
-                <h6 className="max-h-5 w-full">{data.metar}</h6>
+                <h6 className="h-max w-9/10 mb-2">{data.metar}</h6>
 
-                <div className="flex flex-row gap-x-10 absolute bottom-0">
+                <div className="flex flex-row gap-x-10">
                     <div>
                         <p className="font-bold mb-.5">Departing</p>
                         <div className="flex flex-row gap-x-2">
@@ -39,8 +39,7 @@ const Atis: React.FC<Props> = ({data}: Props) => {
                     
                 </div>
                 <div className="absolute right-5 bottom-0">
-                    <h6 className="mb-1">Status</h6>
-                    <p className="text-green-500">{data.status}</p>
+                    
                 </div>
             </div>
         </div>
