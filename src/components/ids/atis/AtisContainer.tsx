@@ -1,9 +1,9 @@
 'use client'
 import useDatafeedStore, { ATIS, updateDatafeed } from "@/hooks/datafeed";
-import axios from "axios";
 import { ReactNode, useEffect, useState } from "react";
 import AtisDivider from "./AtisDivider";
 import Atis from "./Atis";
+import AtisSkeleton from "./AtisSkeleton";
 
 const AtisContainer: React.FC = () => {
     const datafeedStore = useDatafeedStore()
@@ -33,11 +33,18 @@ const AtisContainer: React.FC = () => {
     }
 
     if (datafeedStore.atisData.length == 0) {
-        return <div className='w-120 h-full flex justify-center items-center'>
-            <h2>ATIS Data Loading</h2>
-        </div>
+        return (
+            <div className="bg-dark-gray w-120 top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
+                <AtisSkeleton/>
+                <AtisSkeleton/>
+                <AtisSkeleton/>
+                <AtisSkeleton/>
+                <AtisSkeleton/>
+                <AtisSkeleton/>
+                <AtisSkeleton/>
+            </div>
+        )
     }
-
     return (
         <div className="bg-dark-gray w-120 top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
             <AtisMap/>

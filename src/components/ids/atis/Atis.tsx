@@ -1,10 +1,9 @@
 import { ATIS } from "@/hooks/datafeed"
-import { Suspense } from "react"
 
 const Atis: React.FC<Props> = ({data}: Props) => {
     if (!data) {
         return (
-            <tr>not implemented</tr>
+            <tr>Loading</tr>
         )
     }
 
