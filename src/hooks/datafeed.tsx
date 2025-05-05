@@ -3,6 +3,7 @@ import { create } from 'zustand'
 
 const useDatafeedStore = create<DatafeedStore>((set) => ({
     atisData: [] as ATIS[],
+    lastUpdated: undefined
 }));
 
 export const updateDatafeed = async() => {
@@ -13,6 +14,7 @@ export const updateDatafeed = async() => {
 export const setAtis = async(data: ATIS[]) => {
     useDatafeedStore.setState((state) => {
         state.atisData = data
+        state.lastUpdated = new Date()
         return state
     })
 }
@@ -21,6 +23,7 @@ export default useDatafeedStore
 
 interface DatafeedStore {
     atisData: ATIS[]
+    lastUpdated?: Date
 }
 
 export interface ATIS {
