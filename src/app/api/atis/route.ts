@@ -1,5 +1,5 @@
 import axios from "axios"
-import { VATSIMData } from "@/types/vatsim"
+import { VATSIMData } from "@/types/vatsim.type"
 import { ATIS } from "@/hooks/datafeed"
 import { unstable_cache } from "next/cache"
 import { NextResponse } from "next/server"

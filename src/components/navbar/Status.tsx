@@ -1,11 +1,20 @@
 "use client"
-import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu"
+import { formatDateToZ } from "@/lib/date"
 import { Button } from "../ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu"
-import useDatafeedStore from "@/hooks/datafeed"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel } from "../ui/dropdown-menu"
+import { useLastUpdated } from "@/hooks/datafeed"
+import { useEffect, useState } from "react"
 
 const Status: React.FC = () => {
-    const datafeed = useDatafeedStore()
+    const lastUpdated = useLastUpdated()
+    const [atisTimeSince, setAtisTimeSince] = useState(0)
+
+    useEffect(() => {
+        setInterval(() => {
+            setAtisTimeSince(lastUpdated.getTime() - Date.now())
+        }, 1000)
+    })
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -13,9 +22,16 @@ const Status: React.FC = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuLabel>
-                    <h2>ATIS</h2>
-                    <h2>{datafeed.lastUpdated?.toString()}</h2>
+                    <h5>Update Times</h5>
                 </DropdownMenuLabel>
+                <DropdownMenuItem className="border-b-1">
+                    <div className='w-full h-full flex justify-between items-center'>
+                        <h5>ATIS</h5>
+                        <h6
+                        className={atisTimeSince > 60 ? 'text-amber-300' : 'text-green-300'}
+                        >{formatDateToZ(lastUpdated)}</h6>
+                    </div>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

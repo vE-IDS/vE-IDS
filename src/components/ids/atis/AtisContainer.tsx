@@ -1,28 +1,29 @@
 'use client'
-import useDatafeedStore, { ATIS, updateDatafeed } from "@/hooks/datafeed";
+import  { ATIS, useAtisData, useDatafeedActions } from "@/hooks/datafeed";
 import { ReactNode, useEffect, useState } from "react";
 import AtisDivider from "./AtisDivider";
 import Atis from "./Atis";
 import AtisSkeleton from "./AtisSkeleton";
 
 const AtisContainer: React.FC = () => {
-    const datafeedStore = useDatafeedStore()
+    const atisData = useAtisData()
+    const {updateAtis} = useDatafeedActions()
 
     useEffect(() => {
-            updateDatafeed()
+            updateAtis()
     }, [])
 
     useEffect(() => {
         setInterval(async() => {
-            updateDatafeed()
+            updateAtis()
         }, 120000)
     }, [])
     
     const AtisMap = () => {
         const list: ReactNode[] = []
 
-        datafeedStore.atisData.map((atis, i) => {
-            if (i == 0 || atis.facility != datafeedStore.atisData[i-1].facility) {
+        atisData.map((atis, i) => {
+            if (i == 0 || atis.facility != atisData[i-1].facility) {
                 list.push(<AtisDivider facility={atis.facility} key={i + 1000}/>)
             }
 
@@ -32,7 +33,7 @@ const AtisContainer: React.FC = () => {
         return list
     }
 
-    if (datafeedStore.atisData.length == 0) {
+    if (atisData.length == 0) {
         return (
             <div className="bg-dark-gray w-120 top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
                 <AtisSkeleton/>
