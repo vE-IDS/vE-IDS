@@ -27,7 +27,7 @@ const AtisContainer: React.FC = () => {
                 list.push(<AtisDivider facility={atis.facility} key={i + 1000}/>)
             }
 
-            list.push(<Atis data={atis} key={i}/>)
+            list.push(<Atis data={atis} i={i} key={i}/>)
         })
 
         return list

@@ -5,7 +5,7 @@ const DashboardFooter: React.FC = () => {
         <table className="w-max border-t-2 border-dark-gray bg-dark-gray h-20 z-30">
             <tbody>
                 <tr className="overflow-x-scroll">
-                    <FooterButton disabled/>
+                    <FooterButton text='Dashboard' href='/ids'/>
                     <FooterButton disabled/>
                     <FooterButton disabled/>
                     <FooterButton disabled/>
