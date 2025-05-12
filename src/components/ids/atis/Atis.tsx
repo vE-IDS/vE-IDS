@@ -1,7 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { ContextMenu, ContextMenuContent, ContextMenuItem } from "@/components/ui/context-menu"
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuTrigger } from "@/components/ui/context-menu"
 import { ATIS } from "@/types/atis.type"
-import { ContextMenuLabel, ContextMenuTrigger } from "@radix-ui/react-context-menu"
 import { FileWarning, InfoIcon, UsbIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
