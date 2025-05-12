@@ -1,8 +1,7 @@
 import axios from "axios"
 import { VATSIMData } from "@/types/vatsim.type"
-import { ATIS } from "@/hooks/datafeed"
-import { unstable_cache } from "next/cache"
-import { NextResponse } from "next/server"
+import { getAirportData } from "@/actions/airport"
+import { ATIS } from "@/types/atis.type"
 
 export const GET = async() => {
     // Get and parse VATSIM data feed
@@ -13,17 +12,23 @@ export const GET = async() => {
 
     for (const atis of vatsimData.data.atis.filter((data) => data.callsign.charAt(0) == 'K')) {
         const airport = atis.callsign.slice(0, 4)
+        const airportData = await getAirportData(airport)
+
         const metar = await axios.get<string>(`https://aviationweather.gov/api/data/metar`, {params: {ids: airport}, responseType: 'text'})
+        let rawAtis = ''
+        atis.text_atis?.map((e) => {rawAtis += e})
 
         atisDTOs.push(
             {
                 airport: airport,
+                airportName: airportData?.facility_name || '',
                 information: atis.atis_code,
                 metar: metar.data,
                 status: atis ? 'Online' : 'Offline',
-                facility: 'ZMA',
-                activeApproaches: ['XXL', 'XXR'],
-                activeDepartures:  ['XXL', 'XXR'],
+                facility: airportData?.responsible_artcc || '',
+                activeApproaches: ['XXR'],
+                activeDepartures:  ['XXL'],
+                rawAtis: rawAtis
             }
         )
     

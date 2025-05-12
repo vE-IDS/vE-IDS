@@ -1,16 +1,17 @@
 import axios from "axios"
 
 export const getAirportData = async(icao?: string): Promise<Airport | undefined> => {
-    console.log('ran ' + icao)
     if (!icao) {
         return undefined
     }
     
     icao = icao.toUpperCase()
 
-    const response = await axios.get<Airport[]>('https://api.aviationapi.com/v1/airports', 
+    const response = await fetch(`https://api.aviationapi.com/v1/airports?apt=${icao}`, 
         {
-            params: {apt: icao}
+            next: {
+                revalidate: 86400
+            }
         }
     )
 
@@ -19,13 +20,11 @@ export const getAirportData = async(icao?: string): Promise<Airport | undefined>
         return undefined
     }
     
-    const data = response.data
+    const data = await response.json()
 
-    // @ts-expect-error this schema is organized stupidly lol
-    const pop = response.data[icao]
-    if (!pop || !pop[0]) {
+    if (!data || !data[icao] || !data[icao][0]) {
         return undefined
     }
 
-    return pop[0]
+    return data[icao][0]
 }

@@ -18,7 +18,7 @@ const Status: React.FC = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="secondary">Datafeed</Button>
+                <Button variant="secondary">Status</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuLabel>

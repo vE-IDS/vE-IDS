@@ -1,5 +1,5 @@
 'use client'
-import  { ATIS, useAtisData, useDatafeedActions } from "@/hooks/datafeed";
+import  { useAtisData, useDatafeedActions } from "@/hooks/datafeed";
 import { ReactNode, useEffect, useState } from "react";
 import AtisDivider from "./AtisDivider";
 import Atis from "./Atis";
@@ -30,6 +30,7 @@ const AtisContainer: React.FC = () => {
             list.push(<Atis data={atis} i={i} key={i}/>)
         })
 
+        atisData.sort((a, b) => a.facility > b.facility ? 1 : -1)
         return list
     }
 

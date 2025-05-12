@@ -10,8 +10,8 @@ export const Page: React.FC = () => {
     
     const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const updateAirport = (e: unknown) => {
-        const data = airport.safeParse(e!.target.value)
+    const updateAirport = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const data = airport.safeParse(e.target.value)
         if (data.success) {
             setErrorMessage('')
         } else {

@@ -1,3 +1,4 @@
+import { ATIS } from '@/types/atis.type';
 import axios from 'axios';
 import { create } from 'zustand'
 
@@ -27,14 +28,4 @@ interface DatafeedStore {
 
 interface DatafeedActions {
     updateAtis: () => Promise<void>
-}
-
-export interface ATIS {
-    airport: string
-    information?: string
-    metar: string
-    status?: string
-    facility: string
-    activeApproaches?: string[]
-    activeDepartures?: string[]
 }

@@ -1,5 +1,4 @@
 import Clock from "./Clock"
-import useDatafeedStore from "@/hooks/datafeed"
 import Status from "./Status"
 
 const Navbar: React.FC = () => {

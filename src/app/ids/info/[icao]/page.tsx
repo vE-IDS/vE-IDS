@@ -1,4 +1,4 @@
-import { getAirportData } from "@/lib/airport"
+import { getAirportData } from "@/actions/airport"
 
 export default async function Page({params}: Props) {
     const {icao} = await params
@@ -15,6 +15,11 @@ export default async function Page({params}: Props) {
             <div className='p-2 bg-light-gray w-max'>
                 <h2>{airportData.icao_ident} - {airportData.facility_name}</h2>
                 <p>{airportData.city}, {airportData.county} COUNTY, {airportData.state_full}</p>
+            </div>
+
+            <div>
+                <h2>General Info</h2>
+                
             </div>
         </div>
     )
