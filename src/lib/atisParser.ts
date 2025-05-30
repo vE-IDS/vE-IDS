@@ -1,6 +1,5 @@
-// Extended ATIS parser with improved runway parsing, NOTAMs, frequencies, and unified visibility
+const approachTypes = ['ILS', 'LDA', 'VOR', 'RNAV', 'RNP', 'VIS', 'VISUAL', 'GPS', 'LOCALIZER'];
 
-// TypeScript types for structured output
 interface AtisParsedData {
   runways: {
     landingRunways: string[];
@@ -160,54 +159,74 @@ function extractRunwayContexts(text: string): {
   landingRunways: string[],
   departureRunways: string[]
 } {
-  const landingKeywords = ['LANDING', 'LNDG', 'ARRIVING', 'ARVNG', 'APCH', 'APPROACH', 'APCHS', 'INBOUND', 'LND', 'LNDG', 'VISUAL APCH', 'VISUAL APPROACH'];
-  const departureKeywords = ['DEPARTING', 'DEPARTURE', 'DEPTG', 'DEP', 'OUTBOUND', 'DEPG', 'DEPT'];
+  const landingKeywords = ['LANDING', 'LNDG', 'ARRIVING', 'ARVNG', 'APCH', 'APPROACH', 'APCHS', 'INBOUND', 'APP', 'APPROACHES'];
+  const departureKeywords = ['DEPARTING', 'DEPARTURE', 'DEPTG', 'DEP', 'OUTBOUND'];
   const bothKeywords = ['LANDING AND DEPARTING', 'LNDG AND DEP', 'ARVNG AND DEPTG'];
 
   const landingRunways: Set<string> = new Set();
   const departureRunways: Set<string> = new Set();
 
   const normalizedText = text.toUpperCase();
-  const sentences = normalizedText.split(/[\.\?!\n]+/);
+  const sentences = normalizedText.split(/[.!?]+/);
+
+  const spelledOutRunwayRegex = /(?:(?:RWY|RY|RUNWAY)?\s*)?((?:(?:ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|ZERO)[\s-]*){1,3}(?:LEFT|RIGHT|CENTER|CENTRE|L|R|C)?)/gi;
+  const numericRunwayRegex = /(?:RWY|RY|RUNWAY)?\s*(\d{1,2}[LRC]?)/gi;
+
+  // Helper to add runways to sets after formatting
+  function addRunways(runways: string[], targetSet: Set<string>) {
+    runways.forEach(r => {
+      // Normalize single-digit runways with leading zero
+      if (/^\d$/.test(r)) r = '0' + r;
+      targetSet.add(r);
+    });
+  }
 
   for (const sentence of sentences) {
     const hasLanding = landingKeywords.some(k => sentence.includes(k));
     const hasDeparture = departureKeywords.some(k => sentence.includes(k));
     const hasBoth = bothKeywords.some(k => sentence.includes(k));
 
-    // Extract runway mentions with their context, e.g. "RWY 4 AND 8R", "DEPG RWYS 4 AND 8R"
-    const runwayPhraseRegex = /\b(?:RWY|RUNWAY|RY|DEPG?\s+RWYS?|DEPARTING RWYS?)\b[\s\S]*?(?=(?:\.|,|;|$))/gi;
-
     let runways: string[] = [];
 
-    const matches = [...sentence.matchAll(runwayPhraseRegex)];
-    if (matches.length > 0) {
-      for (const m of matches) {
-        runways = runways.concat(extractRunwayListsFromPhrase(m[0]));
-      }
-    } else {
-      // No runway phrase found, fallback: try to find standalone runways in sentence
-      const simpleRunwayMatches = sentence.match(/\b\d{1,2}[LRC]?\b/g);
-      if (simpleRunwayMatches) {
-        runways = runways.concat(simpleRunwayMatches.map(normalizeRunway));
-      }
+    // Check if sentence mentions approach types before runways for landing runways
+    const approachRegex = new RegExp(`\\b(${approachTypes.join('|')})\\b[^.]*?(RWY|RY|RUNWAY)?\\s*(\\d{1,2}[LRC]?(?:\\s*(?:AND|,)\\s*(\\d{1,2}[LRC]?))*)`, 'gi');
+
+    let approachRunways: string[] = [];
+    for (const match of sentence.matchAll(approachRegex)) {
+      // Extract all runway numbers after approach keyword
+      const runwaysStr = match[3];
+      const extractedRunways = runwaysStr.split(/\s*(?:AND|,)\s*/);
+      approachRunways.push(...extractedRunways);
     }
 
-    // Remove duplicates in this sentence
-    runways = [...new Set(runways)];
+    // Extract numeric and spelled-out runways from sentence normally
+    for (const match of sentence.matchAll(numericRunwayRegex)) {
+      runways.push(match[1]);
+    }
+    for (const match of sentence.matchAll(spelledOutRunwayRegex)) {
+      const rwy = wordToRunwayWithSuffix(match[1]);
+      if (rwy) runways.push(rwy);
+    }
 
+    // Add approach runways as landing runways regardless of keywords
+    addRunways(approachRunways, landingRunways);
+
+    // Now add other runways according to keywords
     if (hasBoth) {
-      runways.forEach(r => { landingRunways.add(r); departureRunways.add(r); });
+      addRunways(runways, landingRunways);
+      addRunways(runways, departureRunways);
     } else if (hasLanding && !hasDeparture) {
-      runways.forEach(r => landingRunways.add(r));
+      addRunways(runways, landingRunways);
     } else if (hasDeparture && !hasLanding) {
-      runways.forEach(r => departureRunways.add(r));
+      addRunways(runways, departureRunways);
+    } else {
+      // If no clear keywords, do nothing or handle differently if you want
     }
   }
 
   return {
     landingRunways: Array.from(landingRunways),
-    departureRunways: Array.from(departureRunways)
+    departureRunways: Array.from(departureRunways),
   };
 }
 
