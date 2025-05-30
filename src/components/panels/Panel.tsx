@@ -3,7 +3,7 @@ import { JSX } from "react"
 const Panel: React.FC<Props> = ({title, children, colspan, rowspan}: Props) => {
     return (
         <div className={`w-full m-1 border-1 border-gray h-full col-span-${colspan ? colspan : 1} row-span-${rowspan ? rowspan : 1}`}>
-            <h3 className='bg-gray text-center py-1 font-semibold'>{title}</h3>
+            <h3 className='bg-gray text-center py-1 font-semibold'>{title?.toUpperCase()}</h3>
 
             <div className='p-1'>
                 {children}
@@ -14,7 +14,7 @@ const Panel: React.FC<Props> = ({title, children, colspan, rowspan}: Props) => {
 
 interface Props {
     title?: string
-    children?: JSX.Element
+    children?: React.ReactNode
     colspan?: number
     rowspan?: number
 }

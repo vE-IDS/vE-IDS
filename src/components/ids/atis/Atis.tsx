@@ -4,9 +4,12 @@ import { ATIS } from "@/types/atis.type"
 import { FileWarning, InfoIcon, UsbIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
+import { AtisData, parseAtis } from "@/lib/atisParser"
 
 const Atis: React.FC<Props> = ({data, i}: Props) => {
     const router = useRouter()
+    const atisParse = parseAtis(data?.rawAtis)
 
     if (!data) {
         return (
@@ -31,20 +34,20 @@ const Atis: React.FC<Props> = ({data, i}: Props) => {
                             <h6 className="h-max w-9/10 mb-2">{data.metar}</h6>
 
                             <div className="flex flex-row gap-x-10">
-                                { data.activeDepartures?.length != 0 ? 
+                                { atisParse?.departureRunways && atisParse.departureRunways.length != 0 ? 
                                     <div>
                                         <p className="font-bold mb-.5">Departing</p>
                                         <div className="flex flex-row gap-x-2">
-                                        {data.activeDepartures?.map((departure, i) => <p className="approach-box py-.5" key={i}>{departure}</p>)}
+                                        {atisParse?.departureRunways.map((departure, i) => <p className="approach-box py-.5" key={i}>{departure}</p>)}
                                         </div>
                                     </div> : ''
                                 }
                                 
-                                { data.activeDepartures?.length != 0 ? 
+                                { atisParse?.landingRunways && atisParse.landingRunways.length != 0 ? 
                                     <div>
                                         <p className="font-bold mb-.5">Arriving</p>
                                         <div className="flex flex-row gap-x-2">
-                                            {data.activeApproaches?.map((arrival, i) => <p className="approach-box py-.5" key={i}>{arrival}</p>)}
+                                            {atisParse.landingRunways.map((arrival, i) => <p className="approach-box py-.5" key={i}>{arrival}</p>)}
                                         </div>
                                     </div> : ''
                                 }                 
@@ -91,6 +94,6 @@ const Atis: React.FC<Props> = ({data, i}: Props) => {
 export default Atis
 
 type Props = {
-    data?: ATIS
+    data: ATIS
     i: number
 }

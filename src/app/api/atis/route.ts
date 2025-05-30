@@ -16,7 +16,7 @@ export const GET = async() => {
 
         const metar = await axios.get<string>(`https://aviationweather.gov/api/data/metar`, {params: {ids: airport}, responseType: 'text'})
         let rawAtis = ''
-        atis.text_atis?.map((e) => {rawAtis += e})
+        atis.text_atis?.map((e) => {rawAtis += ' ' + e})
 
         atisDTOs.push(
             {
@@ -26,8 +26,6 @@ export const GET = async() => {
                 metar: metar.data,
                 status: atis ? 'Online' : 'Offline',
                 facility: airportData?.responsible_artcc || '',
-                activeApproaches: ['XXR'],
-                activeDepartures:  ['XXL'],
                 rawAtis: rawAtis
             }
         )

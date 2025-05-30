@@ -1,7 +1,7 @@
 import { getAirportData } from "@/actions/airport"
 
-export default async function Page({params}: Props) {
-    const {icao} = await params
+export default async function ({ params }: Props) {
+    const { icao } = await params
     const airportData = await getAirportData(icao)
     
 
@@ -26,9 +26,9 @@ export default async function Page({params}: Props) {
 }
 
 interface Props {
-    params: {
+    params: Promise<{
         icao: string
-    }
+    }>
 }
 
 export const revalidate = 86400 // 1 day

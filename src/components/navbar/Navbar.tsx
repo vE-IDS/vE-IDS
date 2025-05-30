@@ -9,7 +9,7 @@ const Navbar: React.FC = () => {
 
                 <Clock/>
 
-                <h2>vE-IDS - ARTCC</h2>
+                <h2>vE-IDS - ZJX ARTCC</h2>
             </div>
 
             <div className="absolute top-0 right-0 h-full flex flex-row items-center mr-4">

@@ -131,15 +131,15 @@ body {
 :root {
   --radius: 0.625rem;
   --background: #202020;
-  --foreground: #0249C6;
+  --foreground: #ffffff;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: #202020;
-  --primary-foreground: #0249C6;
+  --primary-foreground: #ffffff;
   --secondary: #202020;
-  --secondary-foreground: #ffffff;
+  --secondary-foreground: #0249C6;
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
@@ -165,15 +165,15 @@ body {
 
 .dark {
   --background: #202020;
-  --foreground: #0249C6;
+  --foreground: #ffffff;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
   --primary: #202020;
-  --primary-foreground: #0249C6;
-  --secondary: #0249C6;
-  --secondary-foreground: oklch(0.985 0 0);
+  --primary-foreground: #ffffff;
+  --secondary: #202020;
+  --secondary-foreground: #0249C6;
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);

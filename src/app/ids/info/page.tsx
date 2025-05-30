@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { z } from 'zod'
 
-export const Page: React.FC = () => {
+export default function Page () {
     const airport = z.string()
     .toLowerCase()
     .length(4, 'Must be four characters.')
@@ -27,5 +27,3 @@ export const Page: React.FC = () => {
         </div>
     )
 }
-
-export default Page

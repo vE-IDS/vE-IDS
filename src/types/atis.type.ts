@@ -5,7 +5,5 @@ export type ATIS = {
     metar: string
     status?: string
     facility: string
-    activeApproaches?: string[]
-    activeDepartures?: string[]
     rawAtis: string
 }
