@@ -1,4 +1,3 @@
-const approachTypes = ['ILS', 'LDA', 'VOR', 'RNAV', 'RNP', 'VIS', 'VISUAL', 'GPS', 'LOCALIZER'];
 const landingKeywords = [ 'LANDING', 'LNDG', 'ARRIVING', 'ARVNG', 'APCH', 'APPROACH', 'APCHS', 'INBOUND', 'VISUAL APP', 'VIS APP', 'APPROACH IN USE', 'ARRIVALS', 'ARRIVAL'];
 const departureKeywords = ['DEPARTING', 'DEPARTURE', 'DEPTG', 'DEP', 'OUTBOUND', 'DEPG', 'DEPS'];
 
@@ -234,7 +233,6 @@ function parseWeatherInfo(text: string) {
   const altimeterMatch = text.match(/A(\d{4})/);
   const windMatch = text.match(/(VRB|\d{3})(\d{2})(G(\d{2}))?KT/);
   const visibilityMatch = text.match(/(\d+\s?\/\s?\d+|\d+\.?\d*|\d+\s\d+\/\d+)SM/);
-  const verticalVisibilityMatch = text.match(/VV(\d{3})/);
   const rvrMatch = text.match(/R(\d{2})([LRC]?)(\/)([MP]?)(\d{4})(V(\d{4}))?/);
   const cloudLayerRegex = /(FEW|SCT|BKN|OVC)(\d{3})/g;
 
