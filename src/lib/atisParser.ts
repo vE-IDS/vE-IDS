@@ -1,4 +1,6 @@
 const approachTypes = ['ILS', 'LDA', 'VOR', 'RNAV', 'RNP', 'VIS', 'VISUAL', 'GPS', 'LOCALIZER'];
+const landingKeywords = [ 'LANDING', 'LNDG', 'ARRIVING', 'ARVNG', 'APCH', 'APPROACH', 'APCHS', 'INBOUND', 'VISUAL APP', 'VIS APP', 'APPROACH IN USE', 'ARRIVALS', 'ARRIVAL'];
+const departureKeywords = ['DEPARTING', 'DEPARTURE', 'DEPTG', 'DEP', 'OUTBOUND', 'DEPG', 'DEPS'];
 
 interface AtisParsedData {
   runways: {
@@ -110,11 +112,12 @@ function wordToRunwayWithSuffix(wordSeq: string): string | null {
     }
   }
 
-  if (digits.length >= 1) {
-    const runwayNumber = digits.join('').padStart(2, '0').slice(0, 2);
-    return suffix ? runwayNumber + suffix : runwayNumber;
+  if (digits.length === 0 || digits.length > 2) {
+    return null;  // Reject if no digits or too many digits (avoid 9750, etc)
   }
-  return null;
+
+  const runwayNumber = digits.join('').padStart(2, '0').slice(0, 2);
+  return suffix ? runwayNumber + suffix : runwayNumber;
 }
 
 function normalizeRunway(runway: string): string {
@@ -159,68 +162,65 @@ function extractRunwayContexts(text: string): {
   landingRunways: string[],
   departureRunways: string[]
 } {
-  const landingKeywords = ['LANDING', 'LNDG', 'ARRIVING', 'ARVNG', 'APCH', 'APPROACH', 'APCHS', 'INBOUND', 'APP', 'APPROACHES'];
-  const departureKeywords = ['DEPARTING', 'DEPARTURE', 'DEPTG', 'DEP', 'OUTBOUND'];
-  const bothKeywords = ['LANDING AND DEPARTING', 'LNDG AND DEP', 'ARVNG AND DEPTG'];
-
   const landingRunways: Set<string> = new Set();
   const departureRunways: Set<string> = new Set();
 
   const normalizedText = text.toUpperCase();
   const sentences = normalizedText.split(/[.!?]+/);
 
-  const spelledOutRunwayRegex = /(?:(?:RWY|RY|RUNWAY)?\s*)?((?:(?:ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|ZERO)[\s-]*){1,3}(?:LEFT|RIGHT|CENTER|CENTRE|L|R|C)?)/gi;
+  // Only 1 or 2 number words for spelled out runways to avoid long numbers
+  const spelledOutRunwayRegex = /(?:(?:RWY|RY|RUNWAY)?\s*)?((?:(?:ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|ZERO)[\s-]*){1,2}(?:LEFT|RIGHT|CENTER|CENTRE|L|R|C)?)/gi;
+
+  // Numeric runway regex for exactly 1 or 2 digits plus optional L/R/C
   const numericRunwayRegex = /(?:RWY|RY|RUNWAY)?\s*(\d{1,2}[LRC]?)/gi;
 
-  // Helper to add runways to sets after formatting
-  function addRunways(runways: string[], targetSet: Set<string>) {
-    runways.forEach(r => {
-      // Normalize single-digit runways with leading zero
-      if (/^\d$/.test(r)) r = '0' + r;
-      targetSet.add(r);
-    });
-  }
+  // Units or words that indicate this is not a runway, like lengths or time
+  const nonRunwayUnits = ['FT', 'FEET', 'MILES', 'MI', 'KM', 'KTS', 'Z', 'UTC', 'AM', 'PM', 'NOVEMBER', 'JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOV', 'DEC'];
 
   for (const sentence of sentences) {
     const hasLanding = landingKeywords.some(k => sentence.includes(k));
     const hasDeparture = departureKeywords.some(k => sentence.includes(k));
-    const hasBoth = bothKeywords.some(k => sentence.includes(k));
 
-    let runways: string[] = [];
+    // Collect runways found this sentence
+    const runways: string[] = [];
 
-    // Check if sentence mentions approach types before runways for landing runways
-    const approachRegex = new RegExp(`\\b(${approachTypes.join('|')})\\b[^.]*?(RWY|RY|RUNWAY)?\\s*(\\d{1,2}[LRC]?(?:\\s*(?:AND|,)\\s*(\\d{1,2}[LRC]?))*)`, 'gi');
-
-    let approachRunways: string[] = [];
-    for (const match of sentence.matchAll(approachRegex)) {
-      // Extract all runway numbers after approach keyword
-      const runwaysStr = match[3];
-      const extractedRunways = runwaysStr.split(/\s*(?:AND|,)\s*/);
-      approachRunways.push(...extractedRunways);
-    }
-
-    // Extract numeric and spelled-out runways from sentence normally
+    // Check numeric runways
     for (const match of sentence.matchAll(numericRunwayRegex)) {
-      runways.push(match[1]);
+      const rwy = match[1];
+      const indexAfter = match.index! + match[0].length;
+      const afterText = sentence.slice(indexAfter, indexAfter + 10); // look ahead
+
+      // Reject if directly followed by digit (part of longer number)
+      if (/^\d/.test(afterText)) continue;
+
+      // Reject if followed by nonRunwayUnits words
+      if (nonRunwayUnits.some(unit => afterText.includes(unit))) continue;
+
+      runways.push(rwy.padStart(2, '0')); // pad single digits
     }
+
+    // Check spelled-out runways
     for (const match of sentence.matchAll(spelledOutRunwayRegex)) {
-      const rwy = wordToRunwayWithSuffix(match[1]);
-      if (rwy) runways.push(rwy);
+      const rwyRaw = match[1];
+      const indexAfter = match.index! + match[0].length;
+      const afterText = sentence.slice(indexAfter, indexAfter + 10);
+
+      // Reject if followed by nonRunwayUnits words
+      if (nonRunwayUnits.some(unit => afterText.includes(unit))) continue;
+
+      const rwy = wordToRunwayWithSuffix(rwyRaw);
+      if (rwy) runways.push(rwy.padStart(2, '0'));
     }
 
-    // Add approach runways as landing runways regardless of keywords
-    addRunways(approachRunways, landingRunways);
-
-    // Now add other runways according to keywords
-    if (hasBoth) {
-      addRunways(runways, landingRunways);
-      addRunways(runways, departureRunways);
-    } else if (hasLanding && !hasDeparture) {
-      addRunways(runways, landingRunways);
+    if (hasLanding && !hasDeparture) {
+      runways.forEach(r => landingRunways.add(r));
     } else if (hasDeparture && !hasLanding) {
-      addRunways(runways, departureRunways);
-    } else {
-      // If no clear keywords, do nothing or handle differently if you want
+      runways.forEach(r => departureRunways.add(r));
+    } else if (hasLanding && hasDeparture) {
+      runways.forEach(r => {
+        landingRunways.add(r);
+        departureRunways.add(r);
+      });
     }
   }
 
