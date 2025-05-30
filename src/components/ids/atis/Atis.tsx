@@ -5,7 +5,7 @@ import { FileWarning, InfoIcon, UsbIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { AtisData, parseAtis } from "@/lib/atisParser"
+import { parseAtis } from "@/lib/atisParser"
 
 const Atis: React.FC<Props> = ({data, i}: Props) => {
     const router = useRouter()
@@ -22,32 +22,35 @@ const Atis: React.FC<Props> = ({data, i}: Props) => {
             <ContextMenu>
                 <ContextMenuTrigger className=''>
                     <div className={'flex flex-row px-5 py-6 z-10 ' + (i % 2 == 0 ? 'bg-light-gray' : 'odd:bg-mid-gray')}>
-                        <div>
+                        <div className='flex flex-col justify-center items-center'>
                             <h5 className="max-w-18 text-center">{data.airport}</h5>
 
-                            <div className="bg-green-700 relative w-15 h-15 flex justify-center items-center drop-shadow-md drop-shadow-black">
+                            <div className="bg-green-700 relative w-18 h-18 flex justify-center items-center drop-shadow-md drop-shadow-black">
                                 <h1 className="text-center text-3xl">{data.information}</h1>
                             </div>
+                            {atisParse.atisType == 'DEPARTURE' || atisParse.atisType == 'ARRIVAL' ?
+                            <p>{atisParse.atisType.toUpperCase()}</p>
+                            : ''}
                         </div>
 
                         <div className="pl-5 w-100 relative z-0">
                             <h6 className="h-max w-9/10 mb-2">{data.metar}</h6>
 
                             <div className="flex flex-row gap-x-10">
-                                { atisParse?.departureRunways && atisParse.departureRunways.length != 0 ? 
+                                { atisParse?.runways.departureRunways && atisParse.runways.departureRunways.length != 0 ? 
                                     <div>
                                         <p className="font-bold mb-.5">Departing</p>
                                         <div className="flex flex-row gap-x-2">
-                                        {atisParse?.departureRunways.map((departure, i) => <p className="approach-box py-.5" key={i}>{departure}</p>)}
+                                        {atisParse.runways.departureRunways.map((departure, i) => <p className="approach-box py-.5" key={i}>{departure}</p>)}
                                         </div>
                                     </div> : ''
                                 }
                                 
-                                { atisParse?.landingRunways && atisParse.landingRunways.length != 0 ? 
+                                { atisParse?.runways.landingRunways && atisParse.runways.landingRunways.length != 0 ? 
                                     <div>
                                         <p className="font-bold mb-.5">Arriving</p>
                                         <div className="flex flex-row gap-x-2">
-                                            {atisParse.landingRunways.map((arrival, i) => <p className="approach-box py-.5" key={i}>{arrival}</p>)}
+                                            {atisParse.runways.landingRunways.map((arrival, i) => <p className="approach-box py-.5" key={i}>{arrival}</p>)}
                                         </div>
                                     </div> : ''
                                 }                 
