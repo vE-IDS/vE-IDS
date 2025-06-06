@@ -1,7 +1,7 @@
-const AtisDivider: React.FC<Props> = ({facility}: Props) => {
+const AtisDivider: React.FC<Props> = ({label}: Props) => {
     return (
         <div className="w-full bg-dark-gray">
-            <h4 className="text-center">{facility.toUpperCase()} Facilities</h4>
+            <h4 className="text-center">{label}</h4>
         </div>
     )
 }
@@ -9,5 +9,5 @@ const AtisDivider: React.FC<Props> = ({facility}: Props) => {
 export default AtisDivider
 
 type Props = {
-    facility: String
+    label: string
 }
