@@ -5,11 +5,12 @@ import { FileWarning, InfoIcon, UsbIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { parseAtis } from "@/lib/atisParser"
+import { getFlightCategoryColor, parseAtis } from "@/lib/atisParser"
 
-const Atis: React.FC<Props> = ({data, i}: Props) => {
+export default function Atis({data, i}: Props) {
     const router = useRouter()
     const atisParse = parseAtis(data?.rawAtis)
+    console.log(atisParse)
 
     if (!data) {
         return (
@@ -25,7 +26,7 @@ const Atis: React.FC<Props> = ({data, i}: Props) => {
                         <div className='flex flex-col justify-center items-center'>
                             <h5 className="max-w-18 text-center">{data.airport}</h5>
 
-                            <div className="bg-green-700 relative w-18 h-18 flex justify-center items-center drop-shadow-md drop-shadow-black">
+                            <div className={`${getFlightCategoryColor(atisParse.flightCategory)} relative w-18 h-18 flex justify-center items-center drop-shadow-md drop-shadow-black`}>
                                 <h1 className="text-center text-3xl">{data.information}</h1>
                             </div>
                             {atisParse.atisType == 'DEPARTURE' || atisParse.atisType == 'ARRIVAL' ?
@@ -93,8 +94,6 @@ const Atis: React.FC<Props> = ({data, i}: Props) => {
         
     )
 }
-
-export default Atis
 
 type Props = {
     data: ATIS
