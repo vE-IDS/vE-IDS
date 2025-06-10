@@ -1,59 +1,40 @@
 'use client'
-import  { useAtisData, useDatafeedActions } from "@/hooks/datafeed";
-import { ReactNode, useEffect, useState } from "react";
-import AtisDivider from "./AtisDivider";
-import Atis from "./Atis";
-import AtisSkeleton from "./AtisSkeleton";
-import { FileWarning, Filter, InfoIcon, Link, UsbIcon } from "lucide-react";
+import  { useAtisMap, useDatafeedActions } from "@/hooks/datafeed";
+import { useEffect } from "react";
+import { Filter } from "lucide-react";
 import { DialogHeader } from "@/components/ui/dialog";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import router from "next/router";
 import FacilityToggle from "./FacilityToggle";
 import { FACILITIES } from "@/lib/facilities";
 import { Button } from "@/components/ui/button";
 
 const AtisContainer: React.FC = () => {
-    const atisData = useAtisData()
-    const {updateAtis} = useDatafeedActions()
+    const atisMap = useAtisMap()
+    const {updateAtis, parseAtis, selectAllFacilities, removeAllFacilities} = useDatafeedActions()
 
     useEffect(() => {
-            updateAtis()
-    }, [])
-
-    useEffect(() => {
-        setInterval(async() => {
-            updateAtis()
-        }, 120000)
-    }, [])
-    
-    const AtisMap = () => {
-        const list: ReactNode[] = []
-
-        atisData.map((atis, i) => {
-            if (i == 0 || atis.facility != atisData[i-1].facility) {
-                list.push(<AtisDivider label={atis.facility.toUpperCase() + ' Facilities'} key={i + 1000}/>)
-            }
-
-            list.push(<Atis data={atis} i={i} key={i}/>)
+        updateAtis().then(() => {
+            parseAtis()
         })
+        
+        const interval = setInterval(async() => {
+            await updateAtis()
+            parseAtis()
+        }, 120000)
 
-        atisData.sort((a, b) => a.facility > b.facility ? 1 : -1)
-        return list
-    }
+        return clearInterval(interval)
+    }, [])
 
-    if (atisData.length == 0) {
-        return (
-            <div className="bg-dark-gray w-120 top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
-                <AtisSkeleton/>
-                <AtisSkeleton/>
-                <AtisSkeleton/>
-                <AtisSkeleton/>
-                <AtisSkeleton/>
-                <AtisSkeleton/>
-                <AtisSkeleton/>
-            </div>
-        )
-    }
+    const onSelectAll = (() => {
+        selectAllFacilities()
+        parseAtis()
+    })
+
+    const onRemoveAll = (() => {
+        removeAllFacilities()
+        parseAtis()
+    })
+
     return (
         <div className="bg-dark-gray w-120 top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
             <div className="w-full bg-dark-gray border-b-2 mb-2 flex flex-rol justify-center gap-x-5">
@@ -73,13 +54,14 @@ const AtisContainer: React.FC = () => {
                             {FACILITIES.map((data) => <FacilityToggle facility={data}/>)}
                         </div>
 
-                        <Button className='bg-accent'>Select All</Button>
-                        <Button className='bg-accent'>Select None</Button>
+                        <Button className='bg-accent' onClick={onSelectAll}>Select All</Button>
+                        <Button className='bg-accent' onClick={onRemoveAll}>Select None</Button>
                     </DialogContent>
                 </Dialog>
         
             </div>
-            <AtisMap/>
+            
+            {atisMap}
         </div>
     )
 }

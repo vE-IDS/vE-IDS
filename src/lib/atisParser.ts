@@ -26,7 +26,7 @@ interface AtisParsedData {
   };
   notams: string[];
   frequencies: string[];
-  flightCategory?: 'VFR' | 'MVFR' | 'IFR' | 'LIFR'
+  flightCategory: 'VFR' | 'MVFR' | 'IFR' | 'LIFR'
   atisCode?: string;
   atisType: 'ARRIVAL' | 'DEPARTURE' | 'COMBINED' | 'UNKNOWN';
   atisTimeZ?: string;
@@ -272,7 +272,7 @@ function parseWeatherInfo(text: string) {
   };
 }
 
-function getFlightCategory(visibility: number | undefined, ceiling: number | undefined): string {
+function getFlightCategory(visibility: number | undefined, ceiling: number | undefined): 'VFR' | 'MVFR' | 'IFR' | 'LIFR' {
   if (!visibility || !ceiling) {
     return 'VFR'
   }
