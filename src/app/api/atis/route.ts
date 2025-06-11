@@ -3,7 +3,7 @@ import { VATSIMData } from "@/types/vatsim.type"
 import { getAirportData } from "@/actions/airport"
 import { ATIS } from "@/types/atis.type"
 
-export const GET = async() => {
+export async function GET() {
     // Get and parse VATSIM data feed
     const vatsimData = await axios.get<VATSIMData>('https://data.vatsim.net/v3/vatsim-data.json')
     

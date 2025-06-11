@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import axios from "axios";
 
 const inter = Inter({
-  variable: "--font-geist-sans",
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -18,15 +17,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
-  // configure axios
-  axios.defaults.withCredentials = true
-  if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
-    axios.defaults.baseURL = "http://localhost:3000"
-  } else {
-    axios.defaults.baseURL = "updatethis"
-  }
-
   return (
     <html lang="en">
       <body

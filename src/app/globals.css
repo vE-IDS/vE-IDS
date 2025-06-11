@@ -108,7 +108,7 @@
   }
 
   .home-button {
-      @apply bg-light-gray py-1 transition text-center hover:bg-accent w-full
+      @apply bg-light-gray py-1 font-inter text-lg font-light transition text-center hover:bg-accent w-full
   }
 
   .approach-box {

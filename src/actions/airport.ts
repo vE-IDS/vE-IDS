@@ -1,5 +1,3 @@
-import axios from "axios"
-
 export const getAirportData = async(icao?: string): Promise<Airport | undefined> => {
     if (!icao) {
         return undefined

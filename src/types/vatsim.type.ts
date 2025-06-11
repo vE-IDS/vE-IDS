@@ -114,3 +114,43 @@ export type FeedRating = {
 }
 
 export enum FlightRules {"V", "I"}
+
+export type VatsimUser = {
+    data: {
+        cid: string
+        personal: {
+            name_first: string
+            name_last: string
+            name_full: string
+            email: string
+        },
+        
+        vatsim: {
+            rating: {
+                id: number
+                short: string
+                long: string
+            },
+            pilotrating: {
+                id: number
+                short: string
+                long: string
+            },
+            region: {
+                id: string
+                name: string
+            },
+            division: {
+                id: string
+                name: string
+            },
+            subdivision: {
+                id: string
+                name: string
+            }
+        },
+        oauth: {
+            token_valid: boolean
+        }
+    }
+}
