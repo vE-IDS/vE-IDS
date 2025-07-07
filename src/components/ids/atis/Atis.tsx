@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuTrigger } from "@/components/ui/context-menu"
 import { ATIS } from "@/types/atis.type"
-import { FileWarning, InfoIcon, UsbIcon } from "lucide-react"
+import { File, FileWarning, InfoIcon, UsbIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -75,6 +75,9 @@ export default function Atis({data, i}: Props) {
                     </ContextMenuItem>
                     <ContextMenuItem onClick={() => router.push(`/ids/info/${data.airport}`)}>
                         <InfoIcon/> Show airport info
+                    </ContextMenuItem>
+                    <ContextMenuItem onClick={() => router.push(`/ids/charts/${data.airport}`)}>
+                        <File/> Show charts for {data.airport}
                     </ContextMenuItem>
                     <ContextMenuItem onClick={() => router.push(`/ids`)}>
                         <FileWarning/> Show NOTAMS

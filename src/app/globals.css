@@ -99,6 +99,9 @@
 }
 
 @layer components {
+  .chart-select {
+    @apply p-2 border-2
+  }
   .navbar {
       @apply sticky w-screen p-2 bg-mid-gray
   }

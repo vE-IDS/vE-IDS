@@ -3,7 +3,7 @@ import Panel from "./Panel"
 
 const PanelContainer: React.FC = () => {
     return (
-        <div className='panel p-2 grid-container grid-flow-row grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 grid-rows-3 gap-x-1 gap-y-1'>
+        <div className='panel p-1 grid-container grid-flow-row grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 grid-rows-3 gap-x-1 gap-y-1'>
             <TimerPanel/>
             
             <Panel title='test'>

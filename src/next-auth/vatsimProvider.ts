@@ -23,7 +23,6 @@ export const vatsimProvider: Provider = {
     },
     
     profile(profile: VatsimUser) {
-        console.log(profile)
         return {
             id: profile.data.cid,
             cid: profile.data.cid,

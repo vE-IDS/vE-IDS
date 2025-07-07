@@ -6,7 +6,7 @@ const DashboardFooter: React.FC = () => {
             <tbody>
                 <tr className="overflow-x-scroll">
                     <FooterButton text='Dashboard' href='/ids'/>
-                    <FooterButton disabled/>
+                    <FooterButton text='Chart Viewer' href='/ids/charts'/>
                     <FooterButton disabled/>
                     <FooterButton disabled/>
                     <FooterButton disabled/>
