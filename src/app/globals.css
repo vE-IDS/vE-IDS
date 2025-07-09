@@ -132,7 +132,7 @@ body {
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0;
   --background: #202020;
   --foreground: #ffffff;
   --card: oklch(0.205 0 0);

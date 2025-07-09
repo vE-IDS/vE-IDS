@@ -1,11 +1,15 @@
 import { Chart, ChartData, ChartSet } from "@/types/chart.type";
 
-export async function getAvailableCharts(icao: string) {
+export async function getAvailableCharts(icao?: string) {
+    if (!icao) {
+        return undefined
+    }
+    
     const data: Response = await fetch(`https://api.aviationapi.com/v1/charts?apt=${icao}`, {next: { revalidate: 86400 }})
     const chartData: ChartData[] | null = (await data.json())[icao]
 
     if (!chartData || chartData.length == 0) {
-        return null
+        return undefined
     }
 
     const chartSet: ChartSet = {

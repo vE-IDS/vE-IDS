@@ -1,4 +1,5 @@
 import Navbar from "@/components/navbar/Navbar"
+import { Toaster } from 'sonner'
 
 const IDSLayout: React.FC<Props> = ({children}: Props) => {
     return (
@@ -6,6 +7,7 @@ const IDSLayout: React.FC<Props> = ({children}: Props) => {
             <Navbar/>
 
             {children}
+
         </div>
     )
 }

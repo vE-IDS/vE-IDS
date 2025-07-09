@@ -14,8 +14,8 @@ const Clock = () => {
     }
     
     return (
-        <div className="bg-light-gray p-2">
-            <h4>{formatDate(date)}</h4>
+        <div className="bg-light-gray py-2 w-20">
+            <h4 className='w-full text-center'>{formatDate(date)}</h4>
         </div>
     )
 }
