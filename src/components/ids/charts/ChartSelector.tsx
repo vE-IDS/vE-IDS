@@ -1,6 +1,5 @@
 'use client'
 import { TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tabs } from "@radix-ui/react-tabs";
 import ChartButton from "./ChartButton";
 import { ChartSet } from "@/types/chart.type";
 import { getAvailableCharts } from "@/actions/charts";
@@ -12,7 +11,7 @@ import { redirect } from 'next/navigation';
 import { toast, useSonner } from 'sonner';
 import ChartGrid from './ChartGrid';
 
-export default function ChartSelector({icao, chartData}: Props) {
+export default function ChartSelector({icao, chartData, callback}: Props) {
     const airport = z.string().max(4).refine((data) => {
         const s = data.toUpperCase()
 
@@ -82,27 +81,27 @@ export default function ChartSelector({icao, chartData}: Props) {
             <div className='flex flex-col gap-y-5 overflow-scroll'>
                 <div>
                     <h5 className='mb-2 font-bold'>APD</h5>
-                    <ChartGrid charts={chartData.apd} color='bg-blue-900'/>
+                    <ChartGrid charts={chartData.apd} callback={callback} color='bg-blue-900'/>
                 </div>
 
                 <div>
                     <h5 className='mb-2 font-bold'>DP</h5>
-                    <ChartGrid charts={chartData.dp} color='bg-blue-700'/>
+                    <ChartGrid charts={chartData.dp} callback={callback} color='bg-blue-700'/>
                 </div>
 
                 <div>
                     <h5 className='mb-2 font-bold'>STAR</h5>
-                    <ChartGrid charts={chartData.star} color='bg-blue-500'/>
+                    <ChartGrid charts={chartData.star} callback={callback} color='bg-blue-500'/>
                 </div>
 
                 <div>
                     <h5 className='mb-2 font-bold'>IAP</h5>
-                    <ChartGrid charts={chartData.iap} color='bg-gray-500'/>
+                    <ChartGrid charts={chartData.iap} callback={callback} color='bg-gray-500'/>
                 </div>
 
                 <div>
                     <h5 className='mb-2 font-bold'>LAH</h5>
-                    <ChartGrid charts={chartData.lah} color='bg-gray-300'/>
+                    <ChartGrid charts={chartData.lah} callback={callback} color='bg-gray-300'/>
                 </div>
             </div>
             }
@@ -113,6 +112,7 @@ export default function ChartSelector({icao, chartData}: Props) {
 interface Props {
     icao?: string
     chartData?: ChartSet
+    callback: (pdfLink: string) => void
 }
 
 /*

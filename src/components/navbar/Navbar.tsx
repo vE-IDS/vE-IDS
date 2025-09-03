@@ -1,9 +1,9 @@
 import { getServerSession } from "next-auth"
 import Clock from "./Clock"
 import Status from "./Status"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { Home, Map } from "lucide-react"
 import NavbarLink from "./NavbarLink"
+import { authOptions } from '@/next-auth/authOptions'
 
 export default async function Navbar() {
     const session = await getServerSession(authOptions)

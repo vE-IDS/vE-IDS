@@ -3,9 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { Chart } from '@/types/chart.type'
 
-export default function ChartButton({chart, color}: Props) {
+export default function ChartButton({chart, color, callback}: Props) {
     return (
-        <Button className={`col-span-1 row-span-1 p-2 text-[9px] text- ${color}`}>
+        <Button 
+        onClick={() => callback(chart.pdfPath)}
+        className={`col-span-1 row-span-1 p-2 text-[8px] text- ${color}`}>
             {chart.chartName}
         </Button>
     )
@@ -14,4 +16,5 @@ export default function ChartButton({chart, color}: Props) {
 interface Props {
     chart: Chart
     color: string
+    callback: (pdfLink: string) => void
 }

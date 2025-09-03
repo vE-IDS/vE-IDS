@@ -3,7 +3,7 @@ import Link from "next/link";
 import BackgroundImage from '../../public/background.jpg'
 import LoginButton from "@/components/home/LoginButton";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "@/next-auth/authOptions";
 
 import LogoutButton from "@/components/home/LogoutButton";
 

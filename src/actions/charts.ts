@@ -28,7 +28,7 @@ export async function getAvailableCharts(icao?: string) {
         lah: []
     }
 
-    chartData.map((data) => {
+    chartData.map((data, i) => {
         const chart: Chart = {
             chartSeq: data.chart_seq,
             chartCode: data.chart_code,
@@ -37,29 +37,38 @@ export async function getAvailableCharts(icao?: string) {
             pdfPath: data.pdf_path
         }
 
+        console.log(data)
         switch(data.chart_code) {
             case 'APD':
-                chartSet.apd.push(chart)
+                if (chartSet.apd.indexOf(chart) == -1)
+                    chartSet.apd.push(chart)
                 break
             case 'DP':
-                chartSet.dp.push(chart)
+                if (chartSet.dp.indexOf(chart) == -1)
+                    chartSet.dp.push(chart)
                 break
             case 'STAR':
-                chartSet.star.push(chart)
+                if (chartSet.star.indexOf(chart) == -1)
+                    chartSet.star.push(chart)
                 break
             case 'IAP':
-                chartSet.iap.push(chart)
+                if (chartSet.iap.indexOf(chart) == -1)
+                    chartSet.iap.push(chart)
                 break
             case 'MIN':
-                chartSet.min.push(chart)
+                if (chartSet.min.indexOf(chart) == -1)
+                    chartSet.min.push(chart)
                 break
             case 'LAH':
-                chartSet.lah.push(chart)
+                if (chartSet.lah.indexOf(chart) == -1)
+                    chartSet.lah.push(chart)
                 break
             default:
                 break
         }
     })
 
+    console.log(chartData.length)
+    console.log(chartSet.apd.length + chartSet.min.length + chartSet.dp.length + chartSet.star.length + chartSet.iap.length + chartSet.lah.length)
     return chartSet
 }
