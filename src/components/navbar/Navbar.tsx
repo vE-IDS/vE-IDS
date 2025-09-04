@@ -4,6 +4,7 @@ import Status from "./Status"
 import { Home, Map } from "lucide-react"
 import NavbarLink from "./NavbarLink"
 import { authOptions } from '@/next-auth/authOptions'
+import Link from 'next/link'
 
 export default async function Navbar() {
     const session = await getServerSession(authOptions)
@@ -15,7 +16,11 @@ export default async function Navbar() {
 
                 <Clock/>
 
-                <h2>vE-IDS - ZJX ARTCC</h2>
+                <Link href='/ids' className='flex flex-col'>
+                    <h3>vE-IDS</h3>
+
+                    <h6>ZJX ARTCC</h6>
+                </Link>
             </div>
 
             <div className='absolute flex flex-row justify-right items-center gap-x-3 h-full right-0 top-0'>

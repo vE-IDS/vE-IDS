@@ -1,7 +1,7 @@
 const landingKeywords = [ 'LANDING', 'ARR', 'LNDG', 'ARRIVING', 'ARVNG', 'APCH', 'APPROACH', 'APCHS', 'INBOUND', 'VISUAL APP', 'VIS APP', 'VIS IN USE', 'APPROACH IN USE', 'ILS APP', 'ILS IN USE', 'ARRIVALS', 'ARRIVAL', 'EXPECT ILS TO'];
 const departureKeywords = ['DEPARTING', 'DEPARTURE', 'DEPTG', 'DEP', 'OUTBOUND', 'DEPG', 'DEPS'];
 
-interface AtisParsedData {
+export interface AtisParsedData {
   runways: {
     landingRunways: string[];
     departureRunways: string[];

@@ -53,7 +53,7 @@ export default function ChartSelector({icao, chartData, callback}: Props) {
     return (
         <div className='p-2 flex flex-col gap-y-5'>
             <div>
-                <h4>Charts</h4>
+                <h4 className='mb-2'>Charts</h4>
 
                 <div className='flex flex-row flex-wrap gap-x-2 gap-y-2'>
                     <div className='w-40'>

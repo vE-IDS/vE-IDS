@@ -4,13 +4,11 @@ import { ATIS } from "@/types/atis.type"
 import { File, FileWarning, InfoIcon, UsbIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { getFlightCategoryColor, parseAtis } from "@/lib/atisParser"
+import { getFlightCategoryColor, parseAtis } from '@/lib/atisParser'
 
 export default function Atis({data, i}: Props) {
     const router = useRouter()
     const atisParse = parseAtis(data?.rawAtis)
-    console.log(atisParse)
 
     if (!data) {
         return (
