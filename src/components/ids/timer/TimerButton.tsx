@@ -35,10 +35,10 @@ export default function TimerButton({time}: Props) {
     }
 
     return (
-        <Button className={`h-15 rounded-none border-2 p-2 ${localTime <= 30 ? 'text-amber-500' : ''}`} onClick={onClick}>
-            <h1>
+        <Button className={`h-max border-2 bg-black border-amber-500 row-span-1 col-span-1 p-2 ${localTime <= 30 ? 'text-amber-500' : ''}`} onClick={onClick}>
+            <h2 className='text-amber-500 text-5xl'>
                 {Math.floor(localTime / 60)}:{Math.floor(localTime - Math.floor(60 * Math.floor(localTime / 60))).toString().padStart(2, "0")}
-            </h1>
+            </h2>
         </Button>
     )
 }
