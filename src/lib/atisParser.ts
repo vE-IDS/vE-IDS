@@ -71,6 +71,7 @@ function extractAtisTimeZ(text: string): string | undefined {
 
 function determineAtisType(text: string): 'ARRIVAL' | 'DEPARTURE' | 'COMBINED' | 'UNKNOWN' {
   const upperText = text.toUpperCase();
+
   const firstLine = upperText.split(/[\r\n]+/)[0];
 
   // Find position of "INFO <code>" (e.g. INFO R, INFO D)
@@ -130,6 +131,7 @@ function normalizeRunway(runway: string): string {
 
 function extractRunwayListsFromPhrase(phrase: string): string[] {
   // Parses phrases like: "RWY 4 AND 8R" or "4, 8R" into ["04", "08R"]
+
   const runwayList: string[] = [];
 
   // Remove repeated "RWY", "RUNWAY" etc to avoid duplication
@@ -167,6 +169,7 @@ function extractRunwayContexts(text: string): {
   const sentences = normalizedText.split(/[.!?]+/);
 
   // Only 1 or 2 number words for spelled out runways to avoid long numbers
+
   const spelledOutRunwayRegex = /(?:(?:RWY|RY|RUNWAY)?\s*)?((?:(?:ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|ZERO)[\s-]*){1,2}(?:LEFT|RIGHT|CENTER|CENTRE|L|R|C)?)/gi;
 
   // Numeric runway regex for exactly 1 or 2 digits plus optional L/R/C
@@ -272,7 +275,7 @@ function parseWeatherInfo(text: string) {
   };
 }
 
-function getFlightCategory(visibility: number | undefined, ceiling: number | undefined): 'VFR' | 'MVFR' | 'IFR' | 'LIFR' {
+export function getFlightCategory(visibility: number | undefined, ceiling: number | undefined): 'VFR' | 'MVFR' | 'IFR' | 'LIFR' {
   if (!visibility || !ceiling) {
     return 'VFR'
   }

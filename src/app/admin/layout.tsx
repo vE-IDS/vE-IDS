@@ -1,7 +1,7 @@
 import Navbar from "@/components/navbar/Navbar"
 import { Toaster } from 'sonner'
 
-const IDSLayout: React.FC<Props> = ({children}: Props) => {
+export default function AdminLayout({children}: Props) {
     return (
         <div className="bg-mid-gray w-screen h-screen overflow-hidden flex flex-col">
             <Navbar isAdmin/>
@@ -11,8 +11,6 @@ const IDSLayout: React.FC<Props> = ({children}: Props) => {
         </div>
     )
 }
-
-export default IDSLayout
 
 type Props = {
     children: React.ReactNode

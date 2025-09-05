@@ -1,12 +1,12 @@
 import { getServerSession } from "next-auth"
 import Clock from "./Clock"
 import Status from "./Status"
-import { Home, Map } from "lucide-react"
+import { Home, Map, ShieldUser } from "lucide-react"
 import NavbarLink from "./NavbarLink"
 import { authOptions } from '@/next-auth/authOptions'
 import Link from 'next/link'
 
-export default async function Navbar() {
+export default async function Navbar({isAdmin}: Props) {
     const session = await getServerSession(authOptions)
 
     return (
@@ -32,6 +32,10 @@ export default async function Navbar() {
                     <Map/>
                 </NavbarLink>
                 
+                <NavbarLink href='/admin'>
+                    <ShieldUser/>
+                </NavbarLink>
+
                 <div className="h-full justify-center flex flex-col items-end mr-4">
                     <h3>{session?.user.firstName} {session?.user.lastName}</h3>
                     <h6>{session?.user.cid}</h6>
@@ -39,4 +43,8 @@ export default async function Navbar() {
             </div>
         </div>
     )
+}
+
+interface Props {
+    isAdmin: boolean
 }
