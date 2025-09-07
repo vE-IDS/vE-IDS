@@ -1,17 +1,16 @@
 'use client'
 import  { useAtisMap, useDatafeedActions } from "@/hooks/datafeed";
-import { Suspense, useEffect } from "react";
-import { Filter } from "lucide-react";
-import { DialogHeader } from "@/components/ui/dialog";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Suspense, useEffect, useState } from "react";
 import FacilityToggle from "./FacilityToggle";
 import { FACILITIES } from "@/lib/facilities";
-import { Button } from "@/components/ui/button";
 import AtisSkeleton from "./AtisSkeleton";
+import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 
 const AtisContainer: React.FC = () => {
     const atisMap = useAtisMap()
     const {updateAtis, parseAtis, selectAllFacilities, removeAllFacilities} = useDatafeedActions()
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false)
 
     useEffect(() => {
         updateAtis().then(() => {
@@ -36,22 +35,45 @@ const AtisContainer: React.FC = () => {
         parseAtis()
     })
 
+    const handleClose = () => {
+        setDialogOpen(false)
+    }
+
     return (
-        <div className="bg-dark-gray w-120 top-0 z-0 h-full overflow-y-scroll no-scrollbar" >
+        <Box bgcolor={'palette.primary.dark'} borderRight={1} width={480} overflow={'scroll'} className='no-scrollbar'>
             <div className="w-full bg-dark-gray border-b-2 mb-2 flex flex-rol justify-center gap-x-5">
-                <h4 className="text-center sticky">ATIS Viewer</h4>
                 <Suspense fallback={<AtisSkeleton/>}>
-                    <Dialog>
-                        <DialogTrigger>
-                            <Filter/>
-                        </DialogTrigger>
+                    <Stack direction='row' alignItems={'center'}>
+                        <Typography variant='h5'>ATIS Viewer</Typography>
+                    
+                        <Tooltip title='Set Facility Filter'>
+                            <IconButton
+                            onClick={() => setDialogOpen(true)}>
+                                <FilterAltIcon/>
+                            </IconButton>
+                        </Tooltip> 
+                    </Stack>
+            
+                    <Dialog
+                    onClose={handleClose}
+                    open={dialogOpen}
+                    >
+                        <DialogTitle>Select Facilities to Display</DialogTitle>
+                        <IconButton
+                            
+                            aria-label="close"
+                            onClick={handleClose}
+                            sx={(theme) => ({
+                                position: 'absolute',
+                                right: 8,
+                                top: 8,
+                                color: theme.palette.primary.light,
+                            })}
+                        >
+                            <FilterAltIcon/>
+                        </IconButton>
 
                         <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Select Facilities</DialogTitle>
-                                <DialogDescription>Select which facilities you would like to see on the ATIS page.</DialogDescription>
-                            </DialogHeader>
-
                             <div className='flex flex-col'>
                                 {FACILITIES.map((data) => <FacilityToggle facility={data}/>)}
                             </div>
@@ -64,7 +86,7 @@ const AtisContainer: React.FC = () => {
             </div>
             
             {atisMap}
-        </div>
+        </Box>
     )
 }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from "next/navigation"
-import { Button } from "../ui/button"
+import { Button } from '@mui/material'
 import {  signOut } from 'next-auth/react'
 
 export default function LogoutButton() {
@@ -13,7 +13,7 @@ export default function LogoutButton() {
     }
     return (
         <Button
-        className='home-button text-lg rounded-none font-light transition hover:bg-accent'
+        variant='contained'
         onClick={() => handleSignOut()}
         >
             Log Out

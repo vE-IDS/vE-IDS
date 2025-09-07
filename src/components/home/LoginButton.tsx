@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from "next/navigation"
-import { Button } from "../ui/button"
+import { Button } from '@mui/material'
 import { signIn } from 'next-auth/react'
 
 export default function LoginButton() {
@@ -15,7 +15,7 @@ export default function LoginButton() {
     }
     return (
         <Button
-        className='home-button text-lg rounded-none font-light transition hover:bg-accent'
+        variant='contained'
         onClick={() => handleSignIn()}
         >
             Sign in with VATSIM

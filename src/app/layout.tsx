@@ -1,32 +1,36 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
-import { Toaster } from '@/components/ui/sonner';
+import { Theme, ThemeProvider, createTheme } from '@mui/material/styles';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import theme from '@/lib/theme';
+import { GlobalStyles } from '@mui/material';
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "vE-IDS",
   description: "Virtual Enterprise Information Display System",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} ${inter.variable} antialiased`}
-      >
-          <Toaster/>
+const styles = <GlobalStyles
+            styles={{
+              button: {
+                borderRadius: '0px'
+              },
+            }}
+            />
 
-        {children}
+export default function RootLayout(props: any) {
+   const { children } = props;
+   return (
+    <html lang="en">
+      <body>
+        <AppRouterCacheProvider>
+          <ThemeProvider theme={theme}>
+            {styles}
+            {children}
+          </ThemeProvider>
+        </AppRouterCacheProvider>
       </body>
-    </html>
-  );
+     </html>
+   );
 }

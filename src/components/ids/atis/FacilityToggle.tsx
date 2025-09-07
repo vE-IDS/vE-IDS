@@ -1,7 +1,6 @@
 'use client'
-import { Switch } from "@/components/ui/switch"
-import { Separator } from "@/components/ui/separator"
 import { useDatafeedActions, useIncludedFacilities } from "@/hooks/datafeed"
+import { Divider, Switch } from '@mui/material'
 import { useEffect, useState } from "react"
 
 export default function FacilityToggle({facility}: Props) {
@@ -29,7 +28,7 @@ export default function FacilityToggle({facility}: Props) {
                 className='data-[state=checked]:bg-accent'/>
             </div>
             
-            <Separator/>
+            <Divider/>
         </div>
             
     )

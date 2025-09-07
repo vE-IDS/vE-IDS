@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth"
 import Clock from "./Clock"
 import Status from "./Status"
-import { Home, Map, ShieldUser } from "lucide-react"
+import HomeIcon from '@mui/icons-material/Home';
+import MapIcon from '@mui/icons-material/Map';
+import ShieldIcon from '@mui/icons-material/Shield';
 import NavbarLink from "./NavbarLink"
 import { authOptions } from '@/next-auth/authOptions'
 import Link from 'next/link'
@@ -25,15 +27,15 @@ export default async function Navbar({isAdmin}: Props) {
 
             <div className='absolute flex flex-row justify-right items-center gap-x-3 h-full right-0 top-0'>
                 <NavbarLink href='/ids'>
-                    <Home/>
+                    <HomeIcon/>
                 </NavbarLink>
 
                 <NavbarLink href='/ids/charts'>
-                    <Map/>
+                    <MapIcon/>
                 </NavbarLink>
                 
                 <NavbarLink href='/admin'>
-                    <ShieldUser/>
+                    <ShieldIcon/>
                 </NavbarLink>
 
                 <div className="h-full justify-center flex flex-col items-end mr-4">

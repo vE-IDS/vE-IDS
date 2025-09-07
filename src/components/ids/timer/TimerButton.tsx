@@ -1,6 +1,6 @@
 'use client'
-import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { Button, Typography } from "@mui/material";
+import {  useRef, useState } from "react";
 
 export default function TimerButton({time}: Props) {
     const [localTime, setLocalTime] = useState<number>(time)
@@ -35,10 +35,10 @@ export default function TimerButton({time}: Props) {
     }
 
     return (
-        <Button className={`h-max border-2 bg-black border-amber-500 row-span-1 col-span-1 p-2 ${localTime <= 30 ? 'text-amber-500' : ''}`} onClick={onClick}>
-            <h2 className='text-amber-500 text-5xl'>
+        <Button variant='outlined' color='warning' onClick={onClick}>
+            <Typography variant='h3' color='warning'>
                 {Math.floor(localTime / 60)}:{Math.floor(localTime - Math.floor(60 * Math.floor(localTime / 60))).toString().padStart(2, "0")}
-            </h2>
+            </Typography>
         </Button>
     )
 }

@@ -1,5 +1,4 @@
 import Navbar from "@/components/navbar/Navbar"
-import { Toaster } from 'sonner'
 
 export default function AdminLayout({children}: Props) {
     return (

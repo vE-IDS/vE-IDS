@@ -1,36 +1,37 @@
 import Image from "next/image";
-import Link from "next/link";
 import BackgroundImage from '../../public/background.jpg'
-import LoginButton from "@/components/home/LoginButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/next-auth/authOptions";
-
-import LogoutButton from "@/components/home/LogoutButton";
+import LoginButton from '@/components/home/LoginButton';
+import LogoutButton from '@/components/home/LogoutButton';
+import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import Link from 'next/link';
 
 export default async function Home() {
     const session = await getServerSession(authOptions)
     
     return (
-        <div className='absolute top-0 w-screen h-screen overflow-hidden'>
+        <Box position='absolute' top={0} width='100%' height='100%' overflow='hidden'>
             <Image className='absolute top-0 left-0 -z-10 object-center overflow-hidden blur-xs' src={BackgroundImage} alt="site background"/>
 
-            
-            <div className="home-container">
-                <div className="bg-dark-gray flex flex-col h-max justify-center p-5 gap-y-5">
-                    <div>
-                        <h2 className="font-bold w-full text-center">vE-IDS</h2>
-                        <h4>Virtual Enterprise Information Display System</h4>
-                    </div>
+            <Box bgcolor='primary.main' position='absolute' right={0} height='100%' alignContent={'center'} padding={2}>
+                <Paper variant='elevation'>
+                    <Stack padding={2} spacing={2}>
+                        <Stack>
+                            <Typography variant='h4' align='center'>vE-IDS</Typography>
+                            <Typography variant='body1' align='center'>Virtual Enterprise Information Display System</Typography>
+                        </Stack>
 
-                    <div className="flex flex-col gap-y-2">
-                        {!session?.user && <LoginButton/>}
-                        {session?.user && <Link className={`home-button`} href={'/ids'}>IDS Access</Link>}
-                        {session?.user && <LogoutButton/>}
-                    </div>
-                </div>  
+                        <Stack spacing={1}>
+                            {!session?.user && <LoginButton/>}
+                            {session?.user && <Button variant='contained' component={Link} href={'/ids'}>IDS Access</Button>}
+                            {session?.user && <LogoutButton/>}
+                        </Stack>
+                    </Stack>
+                </Paper>
 
                 <h3 className='absolute w-full py-2 bg-dark-gray right-0 bottom-0 text-center'>Version <b>{process.env.VERSION}</b></h3>
-            </div>
-        </div>
+            </Box>
+        </Box>
     );
 }

@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from '@mui/material'
 
 const AtisSkeleton: React.FC = () => {
     return (
