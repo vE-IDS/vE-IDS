@@ -14,7 +14,7 @@ export default async function Home() {
         <Box position='absolute' top={0} width='100%' height='100%' overflow='hidden'>
             <Image className='absolute top-0 left-0 -z-10 object-center overflow-hidden blur-xs' src={BackgroundImage} alt="site background"/>
 
-            <Box bgcolor='primary.main' position='absolute' right={0} height='100%' alignContent={'center'} padding={2}>
+            <Box bgcolor='primary.dark' position='absolute' right={0} height='100%' alignContent={'center'} padding={2}>
                 <Paper variant='elevation'>
                     <Stack padding={2} spacing={2}>
                         <Stack>

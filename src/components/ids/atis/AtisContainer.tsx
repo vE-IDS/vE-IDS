@@ -40,9 +40,19 @@ const AtisContainer: React.FC = () => {
     }
 
     return (
-        <Box bgcolor={'palette.primary.dark'} borderRight={1} width={480} overflow={'scroll'} className='no-scrollbar'>
-            <div className="w-full bg-dark-gray border-b-2 mb-2 flex flex-rol justify-center gap-x-5">
-                <Suspense fallback={<AtisSkeleton/>}>
+        <Box 
+        borderRight={1}
+        borderColor='palette.primary.dark'
+        width={480} 
+        height={'calc(100vh - 140px)'} 
+        overflow={'scroll'} 
+        className='no-scrollbar'>
+            <Stack 
+            width={'100%'}
+            borderBottom={2}
+            marginBottom={2}
+            alignItems={'center'}
+            spacing={'5px'}>
                     <Stack direction='row' alignItems={'center'}>
                         <Typography variant='h5'>ATIS Viewer</Typography>
                     
@@ -82,8 +92,7 @@ const AtisContainer: React.FC = () => {
                             <Button className='bg-accent' onClick={onRemoveAll}>Select None</Button>
                         </DialogContent>
                     </Dialog>
-                </Suspense>
-            </div>
+            </Stack>
             
             {atisMap}
         </Box>

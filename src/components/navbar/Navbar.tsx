@@ -7,7 +7,7 @@ import ShieldIcon from '@mui/icons-material/Shield';
 import NavbarLink from "./NavbarLink"
 import { authOptions } from '@/next-auth/authOptions'
 import Link from 'next/link'
-import { AppBar, Box } from '@mui/material';
+import { AppBar, Box, Stack } from '@mui/material';
 
 export default async function Navbar({isAdmin}: Props) {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,12 @@ export default async function Navbar({isAdmin}: Props) {
     return (
         <Box>
             <AppBar sx={{height: '60px'}}>
-                <div className="flex flex-row items-center gap-x-5 ml-4">
+                <Stack 
+                height={'100%'}
+                direction={'row'}
+                alignItems='center'
+                marginLeft={2}
+                spacing={2}>
                     <Status/>
 
                     <Clock/>
@@ -25,7 +30,7 @@ export default async function Navbar({isAdmin}: Props) {
 
                         <h6>ZJX ARTCC</h6>
                     </Link>
-                </div>
+                </Stack>
 
                 <div className='absolute flex flex-row justify-right items-center gap-x-3 h-full right-0 top-0'>
                     <NavbarLink href='/ids'>

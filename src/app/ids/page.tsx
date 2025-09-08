@@ -1,11 +1,16 @@
 import AtisContainer from "@/components/ids/atis/AtisContainer";
 import DashboardFooter from "@/components/ids/dashboard/DashboardFooter";
 import PanelContainer from "@/components/panels/PanelContainer";
+import { Stack } from '@mui/material';
 
 const IdsIndex = () => {
   return (
     <>
-      <div className="w-screen h-[calc(100%-140px)] flex flex-row">
+      <Stack 
+      width={'100vw'}
+      height={'calc(100%-140px)'}
+      overflow={'hidden'}
+      direction={'row'}>
           <AtisContainer/>
 
           <div className="h-full w-[calc(100%-500px)]">
@@ -14,7 +19,7 @@ const IdsIndex = () => {
           </div>
 
           
-      </div>
+      </Stack>
 
       <div className="z-10">
           <DashboardFooter/>
