@@ -1,12 +1,15 @@
 import Navbar from "@/components/navbar/Navbar"
+import { Box, Stack } from '@mui/material'
 
 const IDSLayout: React.FC<Props> = ({children}: Props) => {
     return (
-        <div className="bg-mid-gray w-screen h-screen overflow-hidden flex flex-col">
-            <Navbar isAdmin/>
+        <Stack direction={'column'}>
+            <Box height={'60px'}>
+                <Navbar isAdmin/>
+            </Box>
 
             {children}
-        </div>
+        </Stack>
     )
 }
 

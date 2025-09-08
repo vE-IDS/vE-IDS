@@ -11,8 +11,8 @@ const theme: Theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      light: '#202020',
-      main: '#141414',
+      light: '#8c8c8c',
+      main: '#525252',
       dark: '#101010',
       contrastText: '#ffffff',
     },
@@ -52,6 +52,15 @@ const theme: Theme = createTheme({
   typography: {
     fontFamily: inter.style.fontFamily,
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 0
+        }
+      }
+    }
+  }
 });
 
 export default theme;

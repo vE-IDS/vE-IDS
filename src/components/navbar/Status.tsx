@@ -1,6 +1,6 @@
 "use client"
 import { formatDateToZ } from "@/lib/date"
-import { Button, Popover, Box } from "@mui/material"
+import { Button, Popover, Box, Typography, Stack } from "@mui/material"
 import { useLastUpdated } from "@/hooks/datafeed"
 import { useEffect, useState } from "react"
 
@@ -18,20 +18,32 @@ const Status: React.FC = () => {
 
     return (
         <Box>
-            <Button onClick={(event: React.MouseEvent<HTMLButtonElement>) => setAnchorE1(event.currentTarget)}>Status</Button>
+            <Button 
+            onClick={(event: React.MouseEvent<HTMLButtonElement>) => setAnchorE1(event.currentTarget)}
+            variant='contained'
+            color='secondary'>
+                Status
+            </Button>
             <Popover
             open={open}
             onClose={() => setAnchorE1(null)}
             anchorEl={anchorE1}
             >     
-                <h5>Update Times</h5>
+                <Box
+                padding={1}>
+                    <Typography>Update Times</Typography>
 
-                <div className='w-full h-full flex justify-between items-center'>
-                    <h5>ATIS</h5>
-                    <h6
-                    className={atisTimeSince > 60 ? 'text-amber-300' : 'text-green-300'}
-                    >{formatDateToZ(lastUpdated)}</h6>
-                </div>
+                    <Stack 
+                    direction='row' 
+                    justifyContent='space-between' 
+                    alignItems='center'>
+                        <Typography variant='h6'>ATIS</Typography>
+                        <Typography
+                        variant='body1'
+                        color={atisTimeSince > 60 ? 'palette.warning.primary' : 'palette.success.primary'}
+                        >{formatDateToZ(lastUpdated)}</Typography>
+                    </Stack>
+                </Box>
             </Popover>
         </Box>
        

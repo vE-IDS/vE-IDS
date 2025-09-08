@@ -1,9 +1,14 @@
+import { Button, IconButton } from '@mui/material'
 import Link from "next/link"
 
 export default function NavbarLink({children, href}: Props) {
     return (
-        <Link className='bg-light-gray p-2 hover:bg-accent transition active:bg-accent' href={href}>
-            {children}
+        <Link href={href}>
+            <Button 
+            color='primary'
+            variant='contained'>
+                {children}
+            </Button>
         </Link>
     )
 }

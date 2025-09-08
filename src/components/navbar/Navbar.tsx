@@ -7,43 +7,47 @@ import ShieldIcon from '@mui/icons-material/Shield';
 import NavbarLink from "./NavbarLink"
 import { authOptions } from '@/next-auth/authOptions'
 import Link from 'next/link'
+import { AppBar, Box } from '@mui/material';
 
 export default async function Navbar({isAdmin}: Props) {
     const session = await getServerSession(authOptions)
 
     return (
-        <div className='navbar z-10'>
-            <div className="flex flex-row items-center gap-x-5 ml-4">
-                <Status/>
+        <Box>
+            <AppBar sx={{height: '60px'}}>
+                <div className="flex flex-row items-center gap-x-5 ml-4">
+                    <Status/>
 
-                <Clock/>
+                    <Clock/>
 
-                <Link href='/ids' className='flex flex-col'>
-                    <h3>vE-IDS</h3>
+                    <Link href='/ids' className='flex flex-col'>
+                        <h3>vE-IDS</h3>
 
-                    <h6>ZJX ARTCC</h6>
-                </Link>
-            </div>
-
-            <div className='absolute flex flex-row justify-right items-center gap-x-3 h-full right-0 top-0'>
-                <NavbarLink href='/ids'>
-                    <HomeIcon/>
-                </NavbarLink>
-
-                <NavbarLink href='/ids/charts'>
-                    <MapIcon/>
-                </NavbarLink>
-                
-                <NavbarLink href='/admin'>
-                    <ShieldIcon/>
-                </NavbarLink>
-
-                <div className="h-full justify-center flex flex-col items-end mr-4">
-                    <h3>{session?.user.firstName} {session?.user.lastName}</h3>
-                    <h6>{session?.user.cid}</h6>
+                        <h6>ZJX ARTCC</h6>
+                    </Link>
                 </div>
-            </div>
-        </div>
+
+                <div className='absolute flex flex-row justify-right items-center gap-x-3 h-full right-0 top-0'>
+                    <NavbarLink href='/ids'>
+                        <HomeIcon/>
+                    </NavbarLink>
+
+                    <NavbarLink href='/ids/charts'>
+                        <MapIcon/>
+                    </NavbarLink>
+                    
+                    <NavbarLink href='/admin'>
+                        <ShieldIcon/>
+                    </NavbarLink>
+
+                    <div className="h-full justify-center flex flex-col items-end mr-4">
+                        <h3>{session?.user.firstName} {session?.user.lastName}</h3>
+                        <h6>{session?.user.cid}</h6>
+                    </div>
+                </div>
+            </AppBar>
+        </Box>
+            
     )
 }
 
