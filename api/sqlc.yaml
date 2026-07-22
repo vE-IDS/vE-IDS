@@ -1,0 +1,15 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    # sqlc reads the goose migrations as the schema (it understands the
+    # -- +goose Up/Down annotations and applies only the up statements).
+    schema: "migrations"
+    queries: "internal/db/queries"
+    gen:
+      go:
+        package: "sqlc"
+        out: "internal/db/sqlc"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_interface: false
+        emit_exact_table_names: false

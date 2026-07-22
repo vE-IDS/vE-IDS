@@ -1,0 +1,19 @@
+# Secrets / env
+.env
+frontend/.env
+
+# Go
+/api/veids
+/api/bin/
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+
+# Embedded SPA build output (the real dist is produced at Docker build time;
+# only the placeholder index.html is committed so the //go:embed compiles).
+/api/web/dist/*
+!/api/web/dist/index.html
+
+# OS / editor
+.DS_Store

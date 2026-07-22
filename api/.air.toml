@@ -1,0 +1,12 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/veids ./cmd/veids"
+  bin = "./tmp/veids"
+  include_ext = ["go", "sql", "html"]
+  exclude_dir = ["tmp", "web/dist"]
+  delay = 500
+
+[misc]
+  clean_on_exit = true

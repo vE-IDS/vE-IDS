@@ -1,0 +1,7 @@
+# Development image for the Go API: runs `air` for hot reload against the source
+# bind-mounted by docker-compose. Not used in production (see api/Dockerfile).
+FROM golang:1.26
+RUN go install github.com/air-verse/air@latest
+WORKDIR /app/api
+EXPOSE 8080
+CMD ["air", "-c", ".air.toml"]

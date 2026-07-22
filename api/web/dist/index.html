@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>vE-IDS</title>
+<!--
+  Placeholder index.html so the //go:embed in embed.go compiles before the
+  frontend is built. The production Docker image replaces this whole dist/
+  directory with the real `frontend/dist` output (`vite build`). In dev the SPA
+  is served by Vite (http://localhost:3000), not from here.
+-->
+<body>
+  <p>vE-IDS API is running. The SPA build has not been embedded in this binary.</p>
+</body>

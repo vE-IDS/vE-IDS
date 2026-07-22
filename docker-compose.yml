@@ -1,0 +1,63 @@
+# Development stack: Postgres + Go API (hot-reload via air) + Vite dev server.
+# Usage: cp .env.example .env  (fill VATSIM creds), then `docker compose up`.
+#   API  -> http://localhost:8080
+#   SPA  -> http://localhost:3000  (proxies /api and /api/ws to the api service)
+#
+# Production is a single image instead (see api/Dockerfile).
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: veids
+      POSTGRES_PASSWORD: veids
+      POSTGRES_DB: veids
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U veids"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile.dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      ENV: dev
+      PORT: "8080"
+      APP_BASE_URL: http://localhost:8080
+      # Overrides the .env value so the API reaches the compose Postgres service.
+      DATABASE_URL: postgres://veids:veids@postgres:5432/veids?sslmode=disable
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api:/app/api
+      - go-mod-cache:/go/pkg/mod
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.dev
+    depends_on:
+      - api
+    environment:
+      # Vite dev-proxy target inside the compose network (see vite.config.ts).
+      API_PROXY_TARGET: http://api:8080
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - web-node-modules:/app/node_modules
+
+volumes:
+  pgdata:
+  go-mod-cache:
+  web-node-modules:

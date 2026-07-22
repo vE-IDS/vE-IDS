@@ -1,0 +1,8 @@
+**/node_modules
+frontend/dist
+api/web/dist/assets
+api/veids
+.git
+.env
+frontend/.env
+**/.DS_Store
