@@ -14,6 +14,11 @@ import (
 
 // handleLogin starts the VATSIM OAuth flow: set a CSRF state cookie and redirect
 // to the VATSIM consent screen.
+//
+// @Summary  Begin VATSIM OAuth login
+// @Tags     auth
+// @Success  302
+// @Router   /auth/vatsim/login [get]
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	state, err := auth.NewState()
 	if err != nil {
@@ -27,6 +32,14 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 // handleCallback completes the OAuth flow: validate state, exchange the code,
 // fetch the profile, upsert the user, issue our JWT + refresh, and redirect to
 // the SPA.
+//
+// @Summary  VATSIM OAuth callback
+// @Tags     auth
+// @Param    code  query string true "Authorization code"
+// @Param    state query string true "CSRF state"
+// @Success  302
+// @Failure  400 {object} errorEnvelope
+// @Router   /auth/vatsim/callback [get]
 func (s *Server) handleCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	q := r.URL.Query()
@@ -94,10 +107,19 @@ func (s *Server) handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	// Relative redirect so it resolves to whatever origin the browser used (the
+	// SPA origin — in dev that's the Vite proxy on :3000, in prod the app domain).
+	http.Redirect(w, r, "/ids", http.StatusFound)
 }
 
 // handleRefresh rotates the refresh token and mints a new access JWT.
+//
+// @Summary  Rotate refresh token and mint a new access JWT
+// @Tags     auth
+// @Produce  json
+// @Success  200 {object} map[string]bool
+// @Failure  401 {object} errorEnvelope
+// @Router   /auth/refresh [post]
 func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	c, err := r.Cookie(auth.RefreshCookie)
@@ -127,25 +149,60 @@ func (s *Server) handleRefresh(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]bool{"ok": true})
 }
 
-// handleMe returns the authenticated user's profile.
+// handleMe returns the authenticated user's profile, including the permissions
+// and facility roles that gate the admin area (so the SPA can conditionally show
+// the Admin nav). Both default to empty for a controller with no facility access.
+//
+// @Summary  Current authenticated user (with permissions + facilities)
+// @Tags     auth
+// @Produce  json
+// @Security CookieAuth
+// @Success  200 {object} map[string]interface{}
+// @Failure  401 {object} errorEnvelope
+// @Router   /auth/me [get]
 func (s *Server) handleMe(w http.ResponseWriter, r *http.Request) {
-	u, _ := auth.UserFrom(r.Context())
-	user, err := s.queries.GetUserByID(r.Context(), u.ID)
+	ctx := r.Context()
+	u, _ := auth.UserFrom(ctx)
+	user, err := s.queries.GetUserByID(ctx, u.ID)
 	if err != nil {
 		writeError(w, http.StatusUnauthorized, "unknown user")
 		return
 	}
+
+	permissions := []string{}
+	if s.fetchPerms != nil {
+		if p, err := s.fetchPerms(ctx, user.Cid); err != nil {
+			s.logger.Warn("me: permission lookup failed", "cid", user.Cid, "err", err)
+		} else {
+			permissions = p
+		}
+	}
+	facilities, err := s.userFacilities(ctx, user.Cid)
+	if err != nil {
+		s.logger.Warn("me: facilities lookup failed", "cid", user.Cid, "err", err)
+		facilities = []AdminFacility{}
+	}
+
 	writeJSON(w, http.StatusOK, map[string]any{
-		"id":        user.ID,
-		"cid":       user.Cid,
-		"firstName": user.FirstName,
-		"lastName":  user.LastName,
-		"email":     user.Email,
-		"rating":    user.Rating,
+		"id":          user.ID,
+		"cid":         user.Cid,
+		"firstName":   user.FirstName,
+		"lastName":    user.LastName,
+		"email":       user.Email,
+		"rating":      user.Rating,
+		"permissions": permissions,
+		"facilities":  facilities,
 	})
 }
 
 // handleLogout revokes the refresh token and clears the cookies.
+//
+// @Summary  Log out (revoke refresh token, clear cookies)
+// @Tags     auth
+// @Produce  json
+// @Security CookieAuth
+// @Success  200 {object} map[string]bool
+// @Router   /auth/logout [post]
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 	if c, err := r.Cookie(auth.RefreshCookie); err == nil {
 		_ = s.refresh.Revoke(r.Context(), c.Value)

@@ -1,65 +1,67 @@
-import { getFlightCategoryColor, parseAtis } from '@/lib/atisParser'
+import { parseAtis } from '@/lib/atisParser'
 import type { AirportWeather } from '@/types/weather.type'
 
 /**
- * Full ATIS body for one airport: the information letter in a flight-category–
- * colored box, the METAR, and departing/arriving runways parsed from the ATIS
- * text. When no ATIS is online (data is null in the WS model) it shows a muted
- * note. Body only — the enclosing AirportRow provides the per-airport controls.
+ * Compact ATIS body: the METAR and the runways in use, meant to sit between the
+ * ICAO and the ATIS code in the row header (those two are rendered by AirportRow).
+ * When no ATIS is online (data is null) it shows a muted note.
  */
 export default function AtisView({ data }: { data: AirportWeather | null }) {
-  const runways = data?.atisText ? parseAtis(data.atisText).runways : undefined
+  if (!data) {
+    return <span className="text-xs text-muted-foreground">No ATIS online on VATSIM</span>
+  }
+
+  const runways = data.atisText ? parseAtis(data.atisText).runways : undefined
+  const hasRunways =
+    !!runways && (runways.departureRunways.length > 0 || runways.landingRunways.length > 0)
 
   return (
-    <div className="flex flex-row gap-x-2.5">
-      <div className="flex flex-col items-center">
-        <div
-          className={`${data?.atisAvailable ? getFlightCategoryColor(data.flightCategory) : 'bg-gray'} relative flex h-16 w-16 items-center justify-center drop-shadow-md`}
-        >
-          <h3 className="text-4xl font-normal">{data?.atisLetter ?? '—'}</h3>
-        </div>
-      </div>
+    <div className="flex flex-col gap-1">
+      {data.airportName && (
+        <span className="text-[11px] text-muted-foreground">{data.airportName}</span>
+      )}
+      {!data.atisAvailable && (
+        <span className="text-[11px] text-muted-foreground">No ATIS on VATSIM — METAR only</span>
+      )}
 
-      <div className="flex flex-1 flex-col">
-        {!data ? (
-          <span className="text-xs text-muted-foreground">No ATIS online on VATSIM</span>
-        ) : (
-          <>
-            {data.airportName && <span className="text-xs text-muted-foreground">{data.airportName}</span>}
-            {!data.atisAvailable && (
-              <span className="text-xs text-muted-foreground">No ATIS on VATSIM — METAR only</span>
-            )}
-            <h6 className="mb-2 w-9/10">{data.metar || 'METAR unavailable'}</h6>
+      <span className="font-mono text-[11px] leading-snug break-words">
+        {data.metar || 'METAR unavailable'}
+      </span>
 
-            <div className="flex flex-row gap-x-10">
-              {runways?.departureRunways && runways.departureRunways.length > 0 && (
-                <div>
-                  <p className="mb-0.5 font-bold">Departing</p>
-                  <div className="flex flex-row gap-x-2">
-                    {runways.departureRunways.map((r, i) => (
-                      <p className="approach-box py-0.5" key={i}>
-                        {r}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {runways?.landingRunways && runways.landingRunways.length > 0 && (
-                <div>
-                  <p className="mb-0.5 font-bold">Arriving</p>
-                  <div className="flex flex-row gap-x-2">
-                    {runways.landingRunways.map((r, i) => (
-                      <p className="approach-box py-0.5" key={i}>
-                        {r}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              )}
+      {hasRunways && (
+        <div className="flex flex-row flex-wrap items-center gap-x-6 gap-y-1 text-xs">
+          {runways.departureRunways.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                Dep
+              </span>
+              {runways.departureRunways.map((r, i) => (
+                <span
+                  className="rounded-sm bg-mid-gray px-1.5 py-0.5 font-mono text-[11px] leading-none text-foreground"
+                  key={`d-${i}`}
+                >
+                  {r}
+                </span>
+              ))}
             </div>
-          </>
-        )}
-      </div>
+          )}
+          {runways.landingRunways.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-semibold tracking-wide text-muted-foreground uppercase">
+                Arr
+              </span>
+              {runways.landingRunways.map((r, i) => (
+                <span
+                  className="rounded-sm bg-mid-gray px-1.5 py-0.5 font-mono text-[11px] leading-none text-foreground"
+                  key={`a-${i}`}
+                >
+                  {r}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

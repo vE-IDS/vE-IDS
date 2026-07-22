@@ -60,6 +60,8 @@ export async function apiFetch<T = unknown>(
   return undefined as T
 }
 
+import type { AdminFacility } from '@/types/facility.type'
+
 export interface CurrentUser {
   id: string
   cid: string
@@ -67,6 +69,10 @@ export interface CurrentUser {
   lastName: string
   email: string
   rating: number
+  /** Effective permission keys (drive admin gating). Empty for most controllers. */
+  permissions: string[]
+  /** Facilities the user administers, with their roles. Empty for most controllers. */
+  facilities: AdminFacility[]
 }
 
 /** Fetch the authenticated user, or null if not signed in. */
@@ -77,6 +83,11 @@ export async function getMe(): Promise<CurrentUser | null> {
     if (err instanceof ApiError && err.status === 401) return null
     throw err
   }
+}
+
+/** Fetch the facilities the current user administers (gated by system.access). */
+export async function getAdminFacilities(): Promise<AdminFacility[]> {
+  return apiFetch<AdminFacility[]>('/admin/facilities')
 }
 
 /** Redirect the browser into the VATSIM OAuth login flow. */

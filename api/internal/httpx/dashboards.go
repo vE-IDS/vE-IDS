@@ -12,6 +12,14 @@ import (
 // handleGetDefaultDashboard returns the user's stored default dashboard config
 // (opaque JSON). 404 when none exists — the SPA then falls back to its bundled
 // default layout. (Full multi-dashboard CRUD is deferred; see docs/NOT-DONE.md.)
+//
+// @Summary  Get the user's default dashboard config
+// @Tags     dashboards
+// @Produce  json
+// @Security CookieAuth
+// @Success  200 {object} map[string]interface{}
+// @Failure  404 {object} errorEnvelope
+// @Router   /dashboards/default [get]
 func (s *Server) handleGetDefaultDashboard(w http.ResponseWriter, r *http.Request) {
 	u, _ := auth.UserFrom(r.Context())
 	row, err := s.queries.GetDefaultDashboard(r.Context(), u.ID)
@@ -26,6 +34,15 @@ func (s *Server) handleGetDefaultDashboard(w http.ResponseWriter, r *http.Reques
 
 // handlePutDefaultDashboard upserts the user's default dashboard. The config is
 // stored as opaque JSONB; structural validation lives on the client for now.
+//
+// @Summary  Save the user's default dashboard config
+// @Tags     dashboards
+// @Accept   json
+// @Produce  json
+// @Security CookieAuth
+// @Success  200 {object} map[string]bool
+// @Failure  400 {object} errorEnvelope
+// @Router   /dashboards/default [put]
 func (s *Server) handlePutDefaultDashboard(w http.ResponseWriter, r *http.Request) {
 	u, _ := auth.UserFrom(r.Context())
 	body, err := io.ReadAll(io.LimitReader(r.Body, 1<<20))

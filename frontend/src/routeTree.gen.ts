@@ -10,7 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as IdsRouteImport } from './routes/ids'
+import { Route as IdsRouteImport } from '././routes/ids.admin
+import { Route as IdsIndexRouteImport } from './routes/ids.index'
+import { Route as IdsAdminRouteImport } from './routes/ids.admin'
+import { Route as IdsChartsRouteImport } from './routes/ids.charts'
+import { Route as IdsMapRouteImport } from './routes/ids.map'
+import { Route as IdsInfoIndexRouteImport } from './routes/ids.info.index'
+import { Route as IdsInfoIcaoRouteImport } from './routes/ids.info.$icao'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,31 +28,102 @@ const IdsRoute = IdsRouteImport.update({
   path: '/ids',
   getParentRoute: () => rootRouteImport,
 } as any)
+const IdsIndexRoute = IdsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => IdsRoute,
+} as any)
+const IdsAdminRoute = IdsAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => IdsRoute,
+} as any)
+const IdsChartsRoute = IdsChartsRouteImport.update({
+  id: '/charts',
+  path: '/charts',
+  getParentRoute: () => IdsRoute,
+} as any)
+const IdsMapRoute = IdsMapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => IdsRoute,
+} as any)
+const IdsInfoIndexRoute = IdsInfoIndexRouteImport.update({
+  id: '/info/',
+  path: '/info/',
+  getParentRoute: () => IdsRoute,
+} as any)
+const IdsInfoIcaoRoute = IdsInfoIcaoRouteImport.update({
+  id: '/info/$icao',
+  path: '/info/$icao',
+  getParentRoute: () => IdsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/ids': typeof IdsRoute
+  '/ids': typeof IdsRouteWithChildren
+  '/ids/admin': typeof IdsAdminRoute
+  '/ids/charts': typeof IdsChartsRoute
+  '/ids/map': typeof IdsMapRoute
+  '/ids/': typeof IdsIndexRoute
+  '/ids/info/$icao': typeof IdsInfoIcaoRoute
+  '/ids/info/': typeof IdsInfoIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/ids': typeof IdsRoute
+  '/ids/admin': typeof IdsAdminRoute
+  '/ids/charts': typeof IdsChartsRoute
+  '/ids/map': typeof IdsMapRoute
+  '/ids': typeof IdsIndexRoute
+  '/ids/info/$icao': typeof IdsInfoIcaoRoute
+  '/ids/info': typeof IdsInfoIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/ids': typeof IdsRoute
+  '/ids': typeof IdsRouteWithChildren
+  '/ids/admin': typeof IdsAdminRoute
+  '/ids/charts': typeof IdsChartsRoute
+  '/ids/map': typeof IdsMapRoute
+  '/ids/': typeof IdsIndexRoute
+  '/ids/info/$icao': typeof IdsInfoIcaoRoute
+  '/ids/info/': typeof IdsInfoIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ids'
+  fullPaths:
+    | '/'
+    | '/ids'
+    | '/ids/admin'
+    | '/ids/charts'
+    | '/ids/map'
+    | '/ids/'
+    | '/ids/info/$icao'
+    | '/ids/info/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ids'
-  id: '__root__' | '/' | '/ids'
+  to:
+    | '/'
+    | '/ids/admin'
+    | '/ids/charts'
+    | '/ids/map'
+    | '/ids'
+    | '/ids/info/$icao'
+    | '/ids/info'
+  id:
+    | '__root__'
+    | '/'
+    | '/ids'
+    | '/ids/admin'
+    | '/ids/charts'
+    | '/ids/map'
+    | '/ids/'
+    | '/ids/info/$icao'
+    | '/ids/info/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  IdsRoute: typeof IdsRoute
+  IdsRoute: typeof IdsRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +142,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IdsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ids/': {
+      id: '/ids/'
+      path: '/'
+      fullPath: '/ids/'
+      preLoaderRoute: typeof IdsIndexRouteImport
+      parentRoute: typeof IdsRoute
+    }
+    '/ids/admin': {
+      id: '/ids/admin'
+      path: '/admin'
+      fullPath: '/ids/admin'
+      preLoaderRoute: typeof IdsAdminRouteImport
+      parentRoute: typeof IdsRoute
+    }
+    '/ids/charts': {
+      id: '/ids/charts'
+      path: '/charts'
+      fullPath: '/ids/charts'
+      preLoaderRoute: typeof IdsChartsRouteImport
+      parentRoute: typeof IdsRoute
+    }
+    '/ids/map': {
+      id: '/ids/map'
+      path: '/map'
+      fullPath: '/ids/map'
+      preLoaderRoute: typeof IdsMapRouteImport
+      parentRoute: typeof IdsRoute
+    }
+    '/ids/info/': {
+      id: '/ids/info/'
+      path: '/info'
+      fullPath: '/ids/info/'
+      preLoaderRoute: typeof IdsInfoIndexRouteImport
+      parentRoute: typeof IdsRoute
+    }
+    '/ids/info/$icao': {
+      id: '/ids/info/$icao'
+      path: '/info/$icao'
+      fullPath: '/ids/info/$icao'
+      preLoaderRoute: typeof IdsInfoIcaoRouteImport
+      parentRoute: typeof IdsRoute
+    }
   }
 }
 
+interface IdsRouteChildren {
+  IdsAdminRoute: typeof IdsAdminRoute
+  IdsChartsRoute: typeof IdsChartsRoute
+  IdsMapRoute: typeof IdsMapRoute
+  IdsIndexRoute: typeof IdsIndexRoute
+  IdsInfoIcaoRoute: typeof IdsInfoIcaoRoute
+  IdsInfoIndexRoute: typeof IdsInfoIndexRoute
+}
+
+const IdsRouteChildren: IdsRouteChildren = {
+  IdsAdminRoute: IdsAdminRoute,
+  IdsChartsRoute: IdsChartsRoute,
+  IdsMapRoute: IdsMapRoute,
+  IdsIndexRoute: IdsIndexRoute,
+  IdsInfoIcaoRoute: IdsInfoIcaoRoute,
+  IdsInfoIndexRoute: IdsInfoIndexRoute,
+}
+
+const IdsRouteWithChildren = IdsRoute._addFileChildren(IdsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  IdsRoute: IdsRoute,
+  IdsRoute: IdsRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

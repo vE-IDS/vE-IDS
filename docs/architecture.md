@@ -31,11 +31,13 @@ Layered so transport depends on domain, domain depends on data/clients, and the
 pure pieces depend on nothing:
 
 ```
-cmd/veids/main.go          composition root: config → pool → migrate → poller+hub → http server → graceful shutdown
+cmd/veids/main.go          composition root: config → pool → migrate → seed → poller+hub → vatusa syncer → http server → graceful shutdown
 internal/config            env → Config (12-factor)
-internal/db                pgxpool, embedded goose migrations, sqlc-generated queries
+internal/db                pgxpool, embedded goose migrations, sqlc-generated queries, modular boot seeder (db/seed)
 internal/auth              VATSIM OAuth client, JWT, rotating refresh tokens, cookies, request-context user
 internal/vatsim            typed clients for the datafeed, METARs, AviationAPI charts
+internal/vatusa            typed client for the VATUSA API (facilities + rosters)
+internal/facility          VATUSA syncer: facilities + access grants (boot + every 2h)
 internal/parser            pure ATIS/METAR text parser (ported from the old app) + golden tests
 internal/atis              assembles per-airport ATIS Reports from the feed + METARs
 internal/feed              the single datafeed poller, the in-memory store, and the WebSocket hub
@@ -96,17 +98,35 @@ TanStack Router (file-based routes) + TanStack Query + Tailwind v4, built by Vit
 to static files. It talks to the API over relative paths:
 
 - **REST** via `src/lib/api.ts` — `credentials: 'include'`; on a 401 it calls
-  `/api/auth/refresh` once and retries.
-- **Live data** via `src/lib/ws.ts` + `src/hooks/useLiveData` — one WebSocket to
-  `/api/ws`; `snapshot` seeds state, `datafeed`/`atis` messages update it. This
-  replaces the old app's `setInterval` polling of Next server actions.
+  `/api/auth/refresh` once and retries. Fetches: `GET /api/auth/me`,
+  `GET/PUT /api/dashboards/default`, `GET /api/charts?airport=ICAO`,
+  `GET /api/airports/:icao`. Server responses are cached with TanStack Query.
+- **Live data** via `src/lib/ws.ts` + the `liveData` **Zustand store** — one
+  WebSocket to `/api/ws`; `snapshot` seeds state, `datafeed`/`atis` messages update
+  it. Selector hooks: `useAtis`, `useDatafeed`, `useLiveStatus`, `useLiveFreshness`.
+  This replaces the old app's `setInterval` polling of Next server actions.
 - **Auth** via `src/hooks/useAuth` — backed by `GET /api/auth/me`; login is a
   full-page redirect to `/api/auth/vatsim/login`.
 
-The centerpiece is the **dashboard** (`/ids`): a modular react-grid-layout panel
-grid. Panels are registered in `src/components/panels/registry.tsx`; each renders
-content only, wrapped in shared `Panel` chrome. The serializable `DashboardConfig`
-(`src/types/dashboard.type.ts`) is what persists to `dashboard_layouts.config`.
+**State split:** long-lived client state lives in **Zustand** (`src/stores/`) — the
+`liveData` store (datafeed/ATIS/status) and the `dashboard` store (config +
+debounced-save status). TanStack Query is used only for server fetches. Auth is
+server state, so it stays in Query.
+
+The centerpiece is the **`/ids`** area, a layout route wrapping child routes:
+`ids.index` (the dashboard), `ids.map` (live Leaflet map), `ids.charts` (chart
+browser + PDF), `ids.info.$icao` (airport info); plus a shared dark **Navbar**
+(status dropdown, clock, nav icons, user), a bottom **Footer** nav, and a
+**PanelToolbar** (add/reset/save). The **dashboard** is a modular react-grid-layout
+grid; panels are registered in `src/components/panels/registry.tsx` (`airport`,
+`timer`, `notes`), each rendering content only inside shared `Panel` chrome. The
+serializable `DashboardConfig` (`src/types/dashboard.type.ts`) persists to
+`dashboard_layouts.config`.
+
+The **map** rides the existing WebSocket — it renders `useDatafeed().pilots`
+directly, with no extra fetch or endpoint. The **charts** and **airport-info** pages
+call the two AviationAPI-backed REST endpoints (server-cached; see
+[data-sources.md](data-sources.md)).
 
 ## Database
 
@@ -120,6 +140,17 @@ except last-known ATIS.
 | `refresh_tokens` | rotating refresh tokens (hash only); replaces NextAuth DB sessions |
 | `dashboard_layouts` | a user's saved dashboard (`config` JSONB) |
 | `atis_state` | last-known ATIS per station; seeds change-detection on restart |
+| `facilities` | VATUSA ARTCCs (name/region/url/active + extensible `metadata` JSONB) |
+| `permissions` | fine-grained capability definitions (seeded on boot) |
+| `roles` | named bundles of permissions (seeded on boot) |
+| `role_permissions` | role → permission mapping |
+| `user_facility_roles` | grants: a CID holds a role at a facility (VATUSA-synced or manual) |
+
+The last five back facility administration — see [permissions.md](permissions.md)
+and [vatusa.md](vatusa.md). Permission/role reference data is applied by an
+idempotent **seeder** (`internal/db/seed`) run on every boot after migrations,
+and facility/staff data by the VATUSA **syncer** (`internal/facility`) on boot +
+every 2h.
 
 ## Conventions
 
