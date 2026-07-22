@@ -1,7 +1,7 @@
 # vE-IDS developer tasks. Run `make help` for the list.
 .DEFAULT_GOAL := help
 
-.PHONY: help dev down logs build test tidy sqlc migrate migrate-down front-build
+.PHONY: help dev down logs build test tidy sqlc openapi migrate migrate-down front-build
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-14s\033[0m %s\n", $$1, $$2}'
@@ -26,6 +26,9 @@ tidy: ## Tidy Go modules
 
 sqlc: ## Regenerate the type-safe DB layer from SQL (needs `sqlc` on PATH)
 	cd api && sqlc generate
+
+openapi: ## Regenerate the OpenAPI spec + docs from handler annotations (needs `swag` on PATH)
+	cd api && swag init -g cmd/veids/main.go -o docs --parseInternal --parseDependency
 
 migrate: ## Apply DB migrations manually (needs $$DATABASE_URL and `goose` on PATH)
 	cd api && goose -dir migrations postgres "$$DATABASE_URL" up

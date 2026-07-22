@@ -45,12 +45,30 @@ Browser              Go API                         VATSIM Connect
   │                     GET  /api/user (Bearer)
   │                     upsert users + accounts
   │                     issue JWT + refresh, set veids_at / veids_rt
-  │ ◀── 302 / ─────────
+  │ ◀── 302 /ids ──────
 ```
 
 `state` is a 32-byte random value stored in a short-lived cookie and compared on
 callback (CSRF protection). PKCE is not used yet (the legacy provider didn't
-either); see [NOT-DONE.md](NOT-DONE.md).
+either); see [NOT-DONE.md](NOT-DONE.md). The callback ends with a **relative**
+`302 /ids`, so the browser lands on whatever origin it was using (the SPA).
+
+### Dev origin (must run same-origin with the SPA)
+
+Cookies are httpOnly and host-only, so the OAuth handshake must happen on the
+**same origin as the SPA** or the cookies won't be sent to it. In dev the SPA is
+the Vite server on `:3000`, which proxies `/api` (including `/api/auth/*`) to the
+Go server on `:8080`. Therefore in dev:
+
+- `APP_BASE_URL=http://localhost:3000` (not `:8080`) — this makes the OAuth
+  `redirect_uri` default to `http://localhost:3000/api/auth/vatsim/callback`, so
+  the callback comes back through the Vite proxy and `Set-Cookie` binds to `:3000`.
+- **Register `http://localhost:3000/api/auth/vatsim/callback`** as a callback URL in
+  the VATSIM Connect dev app.
+
+If `APP_BASE_URL` points at `:8080` in dev, login "works" but strands the browser on
+the API origin with cookies the SPA can't see. In prod there is a single origin, so
+`APP_BASE_URL` is just the public domain and none of this applies.
 
 The VATSIM CID is used as the `users.id` (a stable text PK). Claims on the access
 JWT: `sub` = user id, `cid`, `rat` = rating, plus `iss=veids` / `aud=veids-spa`.
@@ -66,6 +84,19 @@ Refresh tokens are opaque random strings; only their SHA-256 hash is stored in
 3. If expired → 401.
 4. Otherwise issue a new refresh token, mark the old one revoked with
    `replaced_by` pointing at the new id, and mint a fresh access JWT.
+
+## Authorization (admin access)
+
+Authentication (a valid VATSIM login) is separate from **authorization**. Any
+authenticated controller can use the IDS; only the admin area requires a
+permission. The `requirePermission("system.access")` middleware
+(`httpx/middleware.go`) runs after `requireAuth` on the `/api/admin/*` group,
+loads the user's effective permissions from the database by CID, and returns
+**403** if the permission is absent. Permissions are read per request, so the
+access JWT stays identity-only (no role claims). `GET /api/auth/me` also returns
+the user's `permissions` + `facilities` so the SPA can conditionally render the
+Admin nav. See [permissions.md](permissions.md) for the model and
+[vatusa.md](vatusa.md) for how grants are seeded.
 
 ## Client behavior
 

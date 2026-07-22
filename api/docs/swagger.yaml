@@ -1,0 +1,396 @@
+basePath: /api
+definitions:
+  internal_httpx.AdminFacility:
+    properties:
+      active:
+        type: boolean
+      id:
+        type: string
+      name:
+        type: string
+      region:
+        type: integer
+      roles:
+        description: the current user's role keys at this facility
+        items:
+          type: string
+        type: array
+      staff:
+        additionalProperties:
+          format: int64
+          type: integer
+        description: facility staff CIDs, synced from VATUSA
+        type: object
+      url:
+        type: string
+    type: object
+  internal_httpx.errorEnvelope:
+    properties:
+      error:
+        type: string
+    type: object
+  veids_api_internal_atis.Report:
+    properties:
+      airportName:
+        type: string
+      altimeter:
+        type: number
+      atisAvailable:
+        type: boolean
+      atisLetter:
+        type: string
+      atisText:
+        type: string
+      flightCategory:
+        $ref: '#/definitions/veids_api_internal_parser.FlightCategory'
+      icao:
+        type: string
+      metar:
+        type: string
+      wind:
+        $ref: '#/definitions/veids_api_internal_parser.Wind'
+    type: object
+  veids_api_internal_parser.FlightCategory:
+    enum:
+    - VFR
+    - MVFR
+    - IFR
+    - LIFR
+    type: string
+    x-enum-varnames:
+    - VFR
+    - MVFR
+    - IFR
+    - LIFR
+  veids_api_internal_parser.Wind:
+    properties:
+      direction:
+        type: string
+      gust:
+        type: integer
+      speed:
+        type: integer
+    type: object
+  veids_api_internal_vatsim.AirportData:
+    properties:
+      airportName:
+        type: string
+      city:
+        type: string
+      faaIdent:
+        type: string
+      fullState:
+        type: string
+      icaoIdent:
+        type: string
+      military:
+        type: boolean
+      state:
+        type: string
+    type: object
+  veids_api_internal_vatsim.Chart:
+    properties:
+      chartCode:
+        type: string
+      chartName:
+        type: string
+      chartSeq:
+        type: integer
+      pdfName:
+        type: string
+      pdfPath:
+        type: string
+    type: object
+  veids_api_internal_vatsim.ChartSet:
+    properties:
+      airportName:
+        type: string
+      apd:
+        items:
+          $ref: '#/definitions/veids_api_internal_vatsim.Chart'
+        type: array
+      city:
+        type: string
+      dp:
+        items:
+          $ref: '#/definitions/veids_api_internal_vatsim.Chart'
+        type: array
+      faaIdent:
+        type: string
+      fullState:
+        type: string
+      iap:
+        items:
+          $ref: '#/definitions/veids_api_internal_vatsim.Chart'
+        type: array
+      icaoIdent:
+        type: string
+      lah:
+        items:
+          $ref: '#/definitions/veids_api_internal_vatsim.Chart'
+        type: array
+      military:
+        type: boolean
+      min:
+        items:
+          $ref: '#/definitions/veids_api_internal_vatsim.Chart'
+        type: array
+      star:
+        items:
+          $ref: '#/definitions/veids_api_internal_vatsim.Chart'
+        type: array
+      state:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: 'The vE-IDS controller IDS API: VATSIM OAuth authentication, saved
+    dashboards, charts/airport info, a live datafeed/ATIS WebSocket, and facility
+    administration. All non-auth endpoints require the access-JWT cookie.'
+  title: vE-IDS API
+  version: "1.0"
+paths:
+  /admin/facilities:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/internal_httpx.AdminFacility'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      security:
+      - CookieAuth: []
+      summary: List facilities the current user administers
+      tags:
+      - admin
+  /airports/{icao}:
+    get:
+      parameters:
+      - description: Airport ICAO (e.g. KATL)
+        in: path
+        name: icao
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/veids_api_internal_vatsim.AirportData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      security:
+      - CookieAuth: []
+      summary: Airport metadata
+      tags:
+      - charts
+  /airports/{icao}/weather:
+    get:
+      parameters:
+      - description: Airport ICAO (e.g. KATL)
+        in: path
+        name: icao
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/veids_api_internal_atis.Report'
+      security:
+      - CookieAuth: []
+      summary: METAR-only airport weather
+      tags:
+      - charts
+  /auth/logout:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      security:
+      - CookieAuth: []
+      summary: Log out (revoke refresh token, clear cookies)
+      tags:
+      - auth
+  /auth/me:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      security:
+      - CookieAuth: []
+      summary: Current authenticated user (with permissions + facilities)
+      tags:
+      - auth
+  /auth/refresh:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      summary: Rotate refresh token and mint a new access JWT
+      tags:
+      - auth
+  /auth/vatsim/callback:
+    get:
+      parameters:
+      - description: Authorization code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: CSRF state
+        in: query
+        name: state
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Found
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      summary: VATSIM OAuth callback
+      tags:
+      - auth
+  /auth/vatsim/login:
+    get:
+      responses:
+        "302":
+          description: Found
+      summary: Begin VATSIM OAuth login
+      tags:
+      - auth
+  /charts:
+    get:
+      parameters:
+      - description: Airport ICAO (e.g. KATL)
+        in: query
+        name: airport
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/veids_api_internal_vatsim.ChartSet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      security:
+      - CookieAuth: []
+      summary: Airport charts
+      tags:
+      - charts
+  /dashboards/default:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      security:
+      - CookieAuth: []
+      summary: Get the user's default dashboard config
+      tags:
+      - dashboards
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      security:
+      - CookieAuth: []
+      summary: Save the user's default dashboard config
+      tags:
+      - dashboards
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/internal_httpx.errorEnvelope'
+      summary: Health check
+      tags:
+      - system
+securityDefinitions:
+  CookieAuth:
+    in: cookie
+    name: veids_at
+    type: apiKey
+swagger: "2.0"

@@ -24,15 +24,21 @@ export const GRID_BREAKPOINTS: Record<Breakpoint, number> = { lg: 1200, md: 768,
 export const GRID_ROW_HEIGHT = 64
 
 /**
- * The seed dashboard. Includes an Airports panel so the vertical slice shows
- * live ATIS out of the box.
+ * The seed dashboard: an Airports panel (live ATIS) plus a Timers panel, so a new
+ * user lands on a useful board out of the box.
  */
 export function getDefaultDashboard(): DashboardConfig {
   return {
     version: 1,
-    panels: [{ id: 'airport-1', type: 'airport' }],
+    panels: [
+      { id: 'airport-1', type: 'airport' },
+      { id: 'timer-1', type: 'timer' },
+    ],
     layouts: {
-      lg: [{ i: 'airport-1', x: 0, y: 0, w: 5, h: 6, minW: 3, minH: 3 }],
+      lg: [
+        { i: 'airport-1', x: 0, y: 0, w: 5, h: 6, minW: 3, minH: 3 },
+        { i: 'timer-1', x: 5, y: 0, w: 3, h: 4, minW: 2, minH: 3 },
+      ],
     },
   }
 }

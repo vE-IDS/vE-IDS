@@ -13,8 +13,8 @@ import (
 
 // Config is the fully-resolved application configuration.
 type Config struct {
-	Env      string // "dev" or "prod"
-	Port     string
+	Env        string // "dev" or "prod"
+	Port       string
 	AppBaseURL string // public origin, e.g. https://ids.example.com — used for redirect URIs, cookie domain, WS origin check
 
 	DatabaseURL string
@@ -38,6 +38,11 @@ type Config struct {
 	MetarURL             string
 	ChartsAPIURL         string
 	ChartsCacheTTL       time.Duration
+
+	// VATUSA (facility roster / staff).
+	VatusaAPIURL       string
+	VatusaAPIKey       string // optional; the endpoints we use are public
+	VatusaSyncInterval time.Duration
 }
 
 // IsDev reports whether the app is running in development mode (affects logging
@@ -70,6 +75,9 @@ func Load() (Config, error) {
 		MetarURL:             getenv("METAR_URL", "https://aviationweather.gov/api/data/metar"),
 		ChartsAPIURL:         getenv("CHARTS_API_URL", "https://api-v2.aviationapi.com/v2"),
 		ChartsCacheTTL:       getdur("CHARTS_CACHE_TTL", 24*time.Hour),
+		VatusaAPIURL:         getenv("VATUSA_API_URL", "https://api.vatusa.net/v2"),
+		VatusaAPIKey:         os.Getenv("VATUSA_API_KEY"),
+		VatusaSyncInterval:   getdur("VATUSA_SYNC_INTERVAL", 2*time.Hour),
 	}
 
 	// Default the redirect URI from the base URL when not explicitly set.

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Responsive, WidthProvider } from 'react-grid-layout'
 import type { Layout, Layouts } from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
@@ -30,6 +30,17 @@ export default function PanelContainer({
   // react-grid-layout wants a Layouts map keyed by breakpoint.
   const layouts = useMemo<Layouts>(() => config.layouts as unknown as Layouts, [config.layouts])
 
+  // Current responsive breakpoint. We only persist edits made at `lg` (the
+  // stored breakpoint); md/sm are view-only for now.
+  const [breakpoint, setBreakpoint] = useState<Breakpoint>('lg')
+
+  // Persist ONLY on user-initiated drag/resize — never on `onLayoutChange`,
+  // which also fires for width-driven reflows (e.g. opening devtools), which
+  // would otherwise auto-save a shrunken layout over the real one.
+  const persist = (layout: Layout[]) => {
+    if (breakpoint === 'lg') onLayoutsChange('lg', layout)
+  }
+
   return (
     <ResponsiveGridLayout
       className="layout"
@@ -42,12 +53,9 @@ export default function PanelContainer({
       draggableHandle=".panel-drag-handle"
       draggableCancel=".panel-no-drag"
       resizeHandles={['se']}
-      onLayoutChange={(current: Layout[], all: Layouts) => {
-        // Persist the current (lg) view as the source of truth for the slice;
-        // md/sm persistence is deferred. `all` is unused for now.
-        void all
-        onLayoutsChange('lg', current)
-      }}
+      onBreakpointChange={(bp: string) => setBreakpoint(bp as Breakpoint)}
+      onDragStop={(layout: Layout[]) => persist(layout)}
+      onResizeStop={(layout: Layout[]) => persist(layout)}
     >
       {config.panels.map((panel) => {
         const def = getPanelDefinition(panel.type)

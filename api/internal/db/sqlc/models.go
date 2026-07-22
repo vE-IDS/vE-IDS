@@ -41,6 +41,26 @@ type DashboardLayout struct {
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 }
 
+type Facility struct {
+	ID        string             `json:"id"`
+	Name      string             `json:"name"`
+	Url       string             `json:"url"`
+	Region    int32              `json:"region"`
+	Type      string             `json:"type"`
+	Active    bool               `json:"active"`
+	Metadata  []byte             `json:"metadata"`
+	SyncedAt  pgtype.Timestamptz `json:"synced_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Permission struct {
+	Key         string             `json:"key"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+}
+
 type RefreshToken struct {
 	ID         pgtype.UUID        `json:"id"`
 	UserID     string             `json:"user_id"`
@@ -49,6 +69,18 @@ type RefreshToken struct {
 	RevokedAt  pgtype.Timestamptz `json:"revoked_at"`
 	ReplacedBy pgtype.UUID        `json:"replaced_by"`
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type Role struct {
+	Key         string             `json:"key"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+}
+
+type RolePermission struct {
+	RoleKey       string `json:"role_key"`
+	PermissionKey string `json:"permission_key"`
 }
 
 type User struct {
@@ -61,4 +93,14 @@ type User struct {
 	Rating        int32              `json:"rating"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
+}
+
+type UserFacilityRole struct {
+	ID         int64              `json:"id"`
+	Cid        string             `json:"cid"`
+	FacilityID pgtype.Text        `json:"facility_id"`
+	RoleKey    string             `json:"role_key"`
+	Source     string             `json:"source"`
+	GrantedBy  pgtype.Text        `json:"granted_by"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 }

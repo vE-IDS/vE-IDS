@@ -33,12 +33,32 @@ Typed clients live in `api/internal/vatsim/`.
 - **Base:** `https://api-v2.aviationapi.com/v2` (`CHARTS_API_URL`)
 - **Endpoint:** `GET /charts?airport=<ICAO>` — airport metadata + charts grouped by
   category.
-- **Used by:** `internal/vatsim/charts.go` (client implemented; the REST handler
-  and 24h cache are **deferred** — see [NOT-DONE.md](NOT-DONE.md)).
+- **Used by:** `internal/vatsim/charts.go` (`FetchAirportCharts` parses the v2
+  payload into a typed `ChartSet`), served by two REST endpoints in
+  `internal/httpx/charts.go`: `GET /api/charts?airport=ICAO` (full `ChartSet`) and
+  `GET /api/airports/:icao` (the `AirportData` subset). Both require auth and share
+  an in-memory TTL cache (`CHARTS_CACHE_TTL`, default 24h) keyed by ICAO. PDFs are
+  loaded by the browser directly from each chart's `pdfPath` (not proxied).
 - **v1 → v2 notes:** the query param is `airport` (was `apt`); charts live under a
   top-level `charts` object and metadata under `airport_data`; v2 no longer returns
   ARTCC assignment (which is why ARTCC-based grouping was dropped in favor of
   user-curated airport lists).
+
+## VATUSA (facility roster / staff)
+
+- **Base:** `https://api.vatusa.net/v2` (`VATUSA_API_URL`)
+- **Endpoints:** `GET /facility` (list + staff CIDs) and `GET /facility/{id}`
+  (roster roles — the only source of `FACCBT`). Both are public; no key needed
+  for the fields used.
+- **Used by:** `internal/vatusa` (hand-written typed client) via the
+  `internal/facility` syncer.
+- **Cadence:** synced on boot, then every `VATUSA_SYNC_INTERVAL` (default 2h).
+  Results are **persisted** to `facilities` + `user_facility_roles`, so access
+  checks and the admin page read the DB — the DB is the cache.
+- **Why hand-written, not generated:** the published VATUSA OpenAPI spec is too
+  low-fidelity to codegen a usable client from (empty schema properties,
+  unlinked response bodies, mislabeled params, missing `/v2` base).
+- Full detail: [vatusa.md](vatusa.md) · access model: [permissions.md](permissions.md).
 
 ## Adding a new data source
 

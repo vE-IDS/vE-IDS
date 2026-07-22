@@ -1,4 +1,5 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import { Toaster } from '@/components/ui/sonner'
 import type { RouterContext } from '../router'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -6,5 +7,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
-  return <Outlet />
+  return (
+    <>
+      <Outlet />
+      <Toaster />
+    </>
+  )
 }

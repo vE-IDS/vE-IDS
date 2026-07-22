@@ -48,6 +48,25 @@ func Build(feed *vatsim.Datafeed, metarByICAO map[string]string) []Report {
 	return reports
 }
 
+// MetarOnly builds a fallback Report for an airport that has no online ATIS:
+// wind/altimeter/flight-category are derived from the METAR alone (atisAvailable
+// is false, no ATIS letter/text). Used by GET /api/airports/:icao/weather.
+func MetarOnly(icao, metar string) Report {
+	var mp *parser.Parsed
+	if metar != "" {
+		p := parser.Parse(metar)
+		mp = &p
+	}
+	return Report{
+		ICAO:           strings.ToUpper(icao),
+		AtisAvailable:  false,
+		Metar:          metar,
+		FlightCategory: pickCategory(mp, nil),
+		Wind:           pickWind(mp, nil),
+		Altimeter:      pickAltimeter(mp, nil),
+	}
+}
+
 // buildOne mirrors the old buildAirportWeather: prefer the METAR parse for
 // wind/altimeter/category, falling back to the merged ATIS text.
 func buildOne(icao string, entries []vatsim.ATISEntry, metar string) Report {

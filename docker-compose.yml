@@ -33,7 +33,10 @@ services:
     environment:
       ENV: dev
       PORT: "8080"
-      APP_BASE_URL: http://localhost:8080
+      # The SPA (and thus the browser's OAuth origin) is the Vite server on :3000,
+      # which proxies /api here. OAuth must run same-origin with the SPA, so the
+      # public base URL is :3000, not :8080. See docs/auth.md.
+      APP_BASE_URL: http://localhost:3000
       # Overrides the .env value so the API reaches the compose Postgres service.
       DATABASE_URL: postgres://veids:veids@postgres:5432/veids?sslmode=disable
     ports:
