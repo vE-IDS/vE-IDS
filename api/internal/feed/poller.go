@@ -12,6 +12,7 @@ import (
 	"veids/api/internal/atis"
 	"veids/api/internal/db/sqlc"
 	"veids/api/internal/vatsim"
+	"veids/api/internal/vnas"
 )
 
 // metarTTL bounds how often a single airport's METAR is re-fetched.
@@ -26,6 +27,7 @@ type metarEntry struct {
 // and broadcasts it, and detects + broadcasts ATIS changes.
 type Poller struct {
 	client   *vatsim.Client
+	vnas     *vnas.Client
 	store    *Store
 	hub      *Hub
 	queries  *sqlc.Queries
@@ -34,20 +36,27 @@ type Poller struct {
 
 	lastTimestamp string
 
+	// lastControllers is the previous controller set keyed by position id, used
+	// to diff each tick. Poller-local (controllers aren't persisted or seeded).
+	lastControllersTS string
+	lastControllers   map[string]ControllerConnection
+
 	metarMu    sync.Mutex
 	metarCache map[string]metarEntry
 }
 
 // NewPoller constructs a Poller.
-func NewPoller(client *vatsim.Client, store *Store, hub *Hub, queries *sqlc.Queries, interval time.Duration, logger *slog.Logger) *Poller {
+func NewPoller(client *vatsim.Client, vnasClient *vnas.Client, store *Store, hub *Hub, queries *sqlc.Queries, interval time.Duration, logger *slog.Logger) *Poller {
 	return &Poller{
-		client:     client,
-		store:      store,
-		hub:        hub,
-		queries:    queries,
-		interval:   interval,
-		logger:     logger,
-		metarCache: map[string]metarEntry{},
+		client:          client,
+		vnas:            vnasClient,
+		store:           store,
+		hub:             hub,
+		queries:         queries,
+		interval:        interval,
+		logger:          logger,
+		lastControllers: map[string]ControllerConnection{},
+		metarCache:      map[string]metarEntry{},
 	}
 }
 
@@ -87,6 +96,10 @@ func (p *Poller) Run(ctx context.Context) {
 }
 
 func (p *Poller) tick(ctx context.Context) {
+	// Controllers come from a separate upstream (vNAS) with its own change gate,
+	// so run it first — independent of whether the VATSIM datafeed changed below.
+	p.tickControllers(ctx)
+
 	feed, err := p.client.FetchDatafeed(ctx)
 	if err != nil {
 		p.logger.Warn("datafeed fetch failed", "err", err)
@@ -120,6 +133,81 @@ func (p *Poller) tick(ctx context.Context) {
 		p.logger.Info("atis changed", "stations", len(changed))
 		p.broadcast(MsgATIS, changed)
 	}
+}
+
+// tickControllers fetches the vNAS controller feed, gated on its own updatedAt,
+// and broadcasts only the connections that changed since the last tick. A fetch
+// error keeps the last-known set so a vNAS outage never disturbs the datafeed/ATIS.
+func (p *Poller) tickControllers(ctx context.Context) {
+	feed, err := p.vnas.FetchControllers(ctx)
+	if err != nil {
+		p.logger.Warn("controller feed fetch failed", "err", err)
+		return
+	}
+	if feed.UpdatedAt != "" && feed.UpdatedAt == p.lastControllersTS {
+		return // nothing changed upstream
+	}
+	p.lastControllersTS = feed.UpdatedAt
+
+	current := projectControllers(feed)
+	upserted, removed := diffControllers(p.lastControllers, current)
+
+	p.lastControllers = current
+	p.store.SetControllers(current)
+
+	if len(upserted) > 0 || len(removed) > 0 {
+		p.logger.Info("controllers changed", "upserted", len(upserted), "removed", len(removed))
+		p.broadcast(MsgControllers, ControllersDelta{Upserted: upserted, Removed: removed})
+	}
+}
+
+// diffControllers compares the previous and current controller sets (both keyed
+// by position id) and returns the connections that are new or changed (upserted)
+// and the position ids that disappeared (removed). ControllerConnection is
+// comparable, so a plain != detects any field change.
+func diffControllers(prev, current map[string]ControllerConnection) (upserted []ControllerConnection, removed []string) {
+	for id, c := range current {
+		if p, ok := prev[id]; !ok || p != c {
+			upserted = append(upserted, c)
+		}
+	}
+	for id := range prev {
+		if _, ok := current[id]; !ok {
+			removed = append(removed, id)
+		}
+	}
+	return upserted, removed
+}
+
+// projectControllers flattens the feed to one ControllerConnection per staffed
+// position, keyed by position id (a controller on combined positions yields
+// several entries).
+func projectControllers(feed *vnas.ControllerFeed) map[string]ControllerConnection {
+	out := make(map[string]ControllerConnection)
+	for _, c := range feed.Controllers {
+		for _, pos := range c.Positions {
+			if pos.PositionId == "" {
+				continue
+			}
+			out[pos.PositionId] = ControllerConnection{
+				Cid:          c.VatsimData.Cid,
+				Callsign:     c.VatsimData.Callsign,
+				ArtccId:      c.ArtccId,
+				FacilityId:   pos.FacilityId,
+				FacilityName: pos.FacilityName,
+				PositionId:   pos.PositionId,
+				PositionName: pos.PositionName,
+				RadioName:    pos.RadioName,
+				PositionType: pos.PositionType,
+				Frequency:    vnas.FormatFreq(pos.Frequency),
+				IsPrimary:    pos.IsPrimary,
+				IsActive:     c.IsActive,
+				IsObserver:   c.IsObserver,
+				LoginTime:    c.LoginTime,
+			}
+		}
+	}
+	return out
 }
 
 func (p *Poller) fetchMetars(ctx context.Context, stations []string) map[string]string {

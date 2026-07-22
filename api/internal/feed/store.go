@@ -16,11 +16,12 @@ type Store struct {
 	datafeed    *DatafeedProjection
 	atisReports []atis.Report
 	lastLetter  map[string]string
+	controllers map[string]ControllerConnection // keyed by position id
 }
 
 // NewStore returns an empty Store.
 func NewStore() *Store {
-	return &Store{lastLetter: map[string]string{}}
+	return &Store{lastLetter: map[string]string{}, controllers: map[string]ControllerConnection{}}
 }
 
 // SetDatafeed replaces the current datafeed projection.
@@ -34,6 +35,15 @@ func (s *Store) SetDatafeed(p *DatafeedProjection) {
 func (s *Store) SetAtis(reports []atis.Report) {
 	s.mu.Lock()
 	s.atisReports = reports
+	s.mu.Unlock()
+}
+
+// SetControllers replaces the current controller set (used for new-client
+// snapshots). The map is stored by reference; the caller must not mutate it after
+// handing it over.
+func (s *Store) SetControllers(m map[string]ControllerConnection) {
+	s.mu.Lock()
+	s.controllers = m
 	s.mu.Unlock()
 }
 
@@ -68,7 +78,11 @@ func (s *Store) Snapshot() SnapshotData {
 	defer s.mu.RUnlock()
 	reports := make([]atis.Report, len(s.atisReports))
 	copy(reports, s.atisReports)
-	return SnapshotData{Datafeed: s.datafeed, Atis: reports}
+	controllers := make([]ControllerConnection, 0, len(s.controllers))
+	for _, c := range s.controllers {
+		controllers = append(controllers, c)
+	}
+	return SnapshotData{Datafeed: s.datafeed, Atis: reports, Controllers: controllers}
 }
 
 // SnapshotMessage marshals the current state as a MsgSnapshot envelope.

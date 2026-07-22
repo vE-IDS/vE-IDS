@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as IdsRouteImport } from '././routes/ids.admin
+import { Route as IdsRouteImport } from './routes/ids'
 import { Route as IdsIndexRouteImport } from './routes/ids.index'
 import { Route as IdsAdminRouteImport } from './routes/ids.admin'
 import { Route as IdsChartsRouteImport } from './routes/ids.charts'

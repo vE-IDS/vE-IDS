@@ -24,6 +24,7 @@ import (
 	applog "veids/api/internal/log"
 	"veids/api/internal/vatsim"
 	"veids/api/internal/vatusa"
+	"veids/api/internal/vnas"
 	"veids/api/web"
 )
 
@@ -81,9 +82,10 @@ func run() error {
 
 	// Feed poller + WebSocket hub.
 	vatsimClient := vatsim.New(cfg.DatafeedURL, cfg.MetarURL, cfg.ChartsAPIURL)
+	vnasClient := vnas.New(cfg.VnasControllerFeedURL)
 	store := feed.NewStore()
 	hub := feed.NewHub(logger)
-	poller := feed.NewPoller(vatsimClient, store, hub, queries, cfg.DatafeedPollInterval, logger)
+	poller := feed.NewPoller(vatsimClient, vnasClient, store, hub, queries, cfg.DatafeedPollInterval, logger)
 	poller.SeedFromDB(ctx)
 
 	go hub.Run(ctx)

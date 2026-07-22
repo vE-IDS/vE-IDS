@@ -33,11 +33,12 @@ type Config struct {
 	CookieDomain    string
 
 	// Upstream feeds.
-	DatafeedURL          string
-	DatafeedPollInterval time.Duration
-	MetarURL             string
-	ChartsAPIURL         string
-	ChartsCacheTTL       time.Duration
+	DatafeedURL           string
+	DatafeedPollInterval  time.Duration
+	MetarURL              string
+	ChartsAPIURL          string
+	ChartsCacheTTL        time.Duration
+	VnasControllerFeedURL string // vNAS controller feed (env-specific; live by default)
 
 	// VATUSA (facility roster / staff).
 	VatusaAPIURL       string
@@ -57,27 +58,28 @@ func Load() (Config, error) {
 	_ = godotenv.Load()
 
 	c := Config{
-		Env:                  getenv("ENV", "dev"),
-		Port:                 getenv("PORT", "8080"),
-		AppBaseURL:           getenv("APP_BASE_URL", "http://localhost:8080"),
-		DatabaseURL:          os.Getenv("DATABASE_URL"),
-		VatsimAuthURL:        getenv("VATSIM_AUTH_URL", "https://auth-dev.vatsim.net"),
-		VatsimClientID:       os.Getenv("VATSIM_CLIENT_ID"),
-		VatsimClientSecret:   os.Getenv("VATSIM_CLIENT_SECRET"),
-		VatsimRedirectURI:    os.Getenv("VATSIM_REDIRECT_URI"),
-		VatsimScopes:         getenv("VATSIM_SCOPES", "full_name email vatsim_details country"),
-		JWTSigningKey:        os.Getenv("JWT_SIGNING_KEY"),
-		AccessTokenTTL:       getdur("ACCESS_TOKEN_TTL", 15*time.Minute),
-		RefreshTokenTTL:      getdur("REFRESH_TOKEN_TTL", 30*24*time.Hour),
-		CookieDomain:         os.Getenv("COOKIE_DOMAIN"),
-		DatafeedURL:          getenv("DATAFEED_URL", "https://data.vatsim.net/v3/vatsim-data.json"),
-		DatafeedPollInterval: getdur("DATAFEED_POLL_INTERVAL", 15*time.Second),
-		MetarURL:             getenv("METAR_URL", "https://aviationweather.gov/api/data/metar"),
-		ChartsAPIURL:         getenv("CHARTS_API_URL", "https://api-v2.aviationapi.com/v2"),
-		ChartsCacheTTL:       getdur("CHARTS_CACHE_TTL", 24*time.Hour),
-		VatusaAPIURL:         getenv("VATUSA_API_URL", "https://api.vatusa.net/v2"),
-		VatusaAPIKey:         os.Getenv("VATUSA_API_KEY"),
-		VatusaSyncInterval:   getdur("VATUSA_SYNC_INTERVAL", 2*time.Hour),
+		Env:                   getenv("ENV", "dev"),
+		Port:                  getenv("PORT", "8080"),
+		AppBaseURL:            getenv("APP_BASE_URL", "http://localhost:8080"),
+		DatabaseURL:           os.Getenv("DATABASE_URL"),
+		VatsimAuthURL:         getenv("VATSIM_AUTH_URL", "https://auth-dev.vatsim.net"),
+		VatsimClientID:        os.Getenv("VATSIM_CLIENT_ID"),
+		VatsimClientSecret:    os.Getenv("VATSIM_CLIENT_SECRET"),
+		VatsimRedirectURI:     os.Getenv("VATSIM_REDIRECT_URI"),
+		VatsimScopes:          getenv("VATSIM_SCOPES", "full_name email vatsim_details country"),
+		JWTSigningKey:         os.Getenv("JWT_SIGNING_KEY"),
+		AccessTokenTTL:        getdur("ACCESS_TOKEN_TTL", 15*time.Minute),
+		RefreshTokenTTL:       getdur("REFRESH_TOKEN_TTL", 30*24*time.Hour),
+		CookieDomain:          os.Getenv("COOKIE_DOMAIN"),
+		DatafeedURL:           getenv("DATAFEED_URL", "https://data.vatsim.net/v3/vatsim-data.json"),
+		DatafeedPollInterval:  getdur("DATAFEED_POLL_INTERVAL", 15*time.Second),
+		MetarURL:              getenv("METAR_URL", "https://aviationweather.gov/api/data/metar"),
+		ChartsAPIURL:          getenv("CHARTS_API_URL", "https://api-v2.aviationapi.com/v2"),
+		ChartsCacheTTL:        getdur("CHARTS_CACHE_TTL", 24*time.Hour),
+		VnasControllerFeedURL: getenv("VNAS_CONTROLLER_FEED_URL", "https://live.env.vnas.vatsim.net/data-feed/controllers.json"),
+		VatusaAPIURL:          getenv("VATUSA_API_URL", "https://api.vatusa.net/v2"),
+		VatusaAPIKey:          os.Getenv("VATUSA_API_KEY"),
+		VatusaSyncInterval:    getdur("VATUSA_SYNC_INTERVAL", 2*time.Hour),
 	}
 
 	// Default the redirect URI from the base URL when not explicitly set.

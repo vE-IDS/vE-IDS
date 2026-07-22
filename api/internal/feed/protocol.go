@@ -15,6 +15,9 @@ const (
 	MsgDatafeed MessageType = "datafeed"
 	// MsgATIS carries only the ATIS reports that changed this tick.
 	MsgATIS MessageType = "atis"
+	// MsgControllers carries a delta of controller connections (only what
+	// logged on/off/changed this tick), keyed by position id.
+	MsgControllers MessageType = "controllers"
 )
 
 // Message is the envelope for every server->client frame.
@@ -45,8 +48,36 @@ type DatafeedProjection struct {
 	Pilots           []PilotMarker `json:"pilots"`
 }
 
+// ControllerConnection is the slim per-position projection of a vNAS controller
+// connection. A controller staffing combined positions yields one entry per
+// position; PositionId is the delta key. RealName is deliberately excluded (PII).
+type ControllerConnection struct {
+	Cid          string `json:"cid"`
+	Callsign     string `json:"callsign"`
+	ArtccId      string `json:"artccId"`
+	FacilityId   string `json:"facilityId"`
+	FacilityName string `json:"facilityName"`
+	PositionId   string `json:"positionId"`
+	PositionName string `json:"positionName"`
+	RadioName    string `json:"radioName"` // human-readable label, e.g. "O'Hare Tower"
+	PositionType string `json:"positionType"`
+	Frequency    string `json:"frequency"`
+	IsPrimary    bool   `json:"isPrimary"`
+	IsActive     bool   `json:"isActive"`
+	IsObserver   bool   `json:"isObserver"`
+	LoginTime    string `json:"loginTime"`
+}
+
+// ControllersDelta is the payload of a MsgControllers: connections that appeared
+// or changed (Upserted) and position ids that logged off (Removed).
+type ControllersDelta struct {
+	Upserted []ControllerConnection `json:"upserted,omitempty"`
+	Removed  []string               `json:"removed,omitempty"`
+}
+
 // SnapshotData is the payload of a MsgSnapshot: everything a fresh client needs.
 type SnapshotData struct {
-	Datafeed *DatafeedProjection `json:"datafeed"`
-	Atis     []atis.Report       `json:"atis"`
+	Datafeed    *DatafeedProjection    `json:"datafeed"`
+	Atis        []atis.Report          `json:"atis"`
+	Controllers []ControllerConnection `json:"controllers"`
 }

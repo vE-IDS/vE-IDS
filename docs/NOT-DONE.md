@@ -25,7 +25,15 @@ intentionally **not** built yet, with enough notes to pick it up.
   `DashboardConfig` schema when CRUD lands.
 - **WS client→server messages / per-client subscriptions.** v1 watches every ATIS
   present in the feed and pushes to all clients. There is no `subscribe` message or
-  subscription-scoped watched set yet.
+  subscription-scoped watched set yet. The `controllers` stream is likewise broadcast
+  wholesale (every online position to every client); scope it per-facility if/when
+  subscriptions land.
+- **Controller feed scope.** The vNAS controller feed
+  (`feed/poller.go` → `MsgControllers`) is delivered over the WS only — there is no
+  REST controller endpoint and nothing is persisted (the feed is authoritative each
+  poll). It reads the **live** environment only; sweatbox/test is a
+  `VNAS_CONTROLLER_FEED_URL` change, not wired to a UI. No standalone controllers
+  panel yet — only the navbar session indicator + `useControllers()`/`useMyPosition()`.
 - **METAR-only airports over the feed.** The WS only carries ATIS for stations with
   an ATIS *online*. A user who adds an ICAO with no online ATIS gets no data (the
   panel shows "No ATIS online"). The old app's METAR-only fallback for arbitrary
@@ -38,8 +46,10 @@ intentionally **not** built yet, with enough notes to pick it up.
 
 ## Frontend
 
-- **Controllers overlay on the map.** The map has a stubbed "Controllers" layer; the
-  datafeed projection would need controller positions added to carry it.
+- **Controllers overlay on the map.** The map has a stubbed "Controllers" layer. The
+  vNAS `controllers` stream now identifies who's online per position, but it carries
+  **no lat/lon**, so it can't place markers — the overlay still needs position geometry
+  from another source (e.g. boundary/position GeoJSON) before it can render.
 - **Dashboard persistence UI** — the config saves via a debounced PUT and loads the
   default, but there's no explicit save/load UI, no multiple named layouts, and no
   breakpoint persistence beyond `lg`.

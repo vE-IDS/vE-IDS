@@ -8,5 +8,7 @@ export {
   useDatafeed,
   useLiveStatus,
   useLiveFreshness,
+  useControllers,
+  useMyPosition,
   useLiveStore,
 } from '@/stores/liveData'

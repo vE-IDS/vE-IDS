@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 import { PERM_SYSTEM_ACCESS } from '@/types/facility.type'
 import Clock from './Clock'
+import SessionStatus from './SessionStatus'
 import StatusPopover from './StatusPopover'
 
 /**
@@ -43,6 +44,8 @@ export default function Navbar() {
             <Shield size={18} />
           </NavIcon>
         )}
+
+        <SessionStatus />
 
         <div className="ml-2 flex flex-col items-end leading-tight">
           <span className="text-sm">

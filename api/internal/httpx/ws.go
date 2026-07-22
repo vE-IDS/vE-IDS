@@ -31,10 +31,17 @@ func (s *Server) handleWS(w http.ResponseWriter, r *http.Request) {
 // wsAcceptOptions locks the WS origin to the app origin (CSRF defense). Dev
 // allows any origin so the Vite dev server (:3000) can connect through its proxy.
 func (s *Server) wsAcceptOptions() *websocket.AcceptOptions {
+	// permessage-deflate: JSON frames (especially the datafeed) compress well.
+	// NoContextTakeover bounds per-connection compressor memory (the hub already
+	// drops slow consumers) and lets the library pool compressors. Browsers
+	// negotiate the extension automatically, so no client change is needed.
 	if s.cfg.IsDev() {
-		return &websocket.AcceptOptions{OriginPatterns: []string{"*"}}
+		return &websocket.AcceptOptions{
+			OriginPatterns:  []string{"*"},
+			CompressionMode: websocket.CompressionNoContextTakeover,
+		}
 	}
-	opts := &websocket.AcceptOptions{}
+	opts := &websocket.AcceptOptions{CompressionMode: websocket.CompressionNoContextTakeover}
 	if u, err := url.Parse(s.cfg.AppBaseURL); err == nil && u.Host != "" {
 		opts.OriginPatterns = []string{u.Host}
 	}

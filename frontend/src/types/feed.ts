@@ -1,7 +1,7 @@
 /**
  * WebSocket protocol types (must match the Go feed package's protocol.go).
- * Only two live things flow over the socket: datafeed projections and ATIS
- * updates (pushed only when an ATIS changes).
+ * Three live things flow over the socket: datafeed projections, ATIS updates
+ * (pushed only when an ATIS changes), and controller-connection deltas.
  */
 import type { AirportWeather } from './weather.type'
 
@@ -25,6 +25,28 @@ export interface DatafeedProjection {
   pilots: PilotMarker[]
 }
 
+/**
+ * One vNAS controller connection, projected per staffed position. A controller
+ * on combined positions appears once per position; `positionId` is the key.
+ * Real names are not carried (PII).
+ */
+export interface ControllerConnection {
+  cid: string
+  callsign: string
+  artccId: string
+  facilityId: string
+  facilityName: string
+  positionId: string
+  positionName: string
+  radioName: string
+  positionType: string
+  frequency: string
+  isPrimary: boolean
+  isActive: boolean
+  isObserver: boolean
+  loginTime: string
+}
+
 /** Sent once on connect with the full current state. */
 export interface SnapshotMessage {
   type: 'snapshot'
@@ -32,6 +54,7 @@ export interface SnapshotMessage {
   data: {
     datafeed: DatafeedProjection | null
     atis: AirportWeather[]
+    controllers: ControllerConnection[]
   }
 }
 
@@ -49,4 +72,21 @@ export interface AtisMessage {
   data: AirportWeather[]
 }
 
-export type WSMessage = SnapshotMessage | DatafeedMessage | AtisMessage
+/**
+ * Controller delta — connections that logged on/changed (`upserted`) and
+ * position ids that logged off (`removed`) this tick.
+ */
+export interface ControllersMessage {
+  type: 'controllers'
+  ts: number
+  data: {
+    upserted: ControllerConnection[]
+    removed: string[]
+  }
+}
+
+export type WSMessage =
+  | SnapshotMessage
+  | DatafeedMessage
+  | AtisMessage
+  | ControllersMessage
