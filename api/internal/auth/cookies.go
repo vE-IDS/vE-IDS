@@ -55,7 +55,7 @@ func (m *CookieManager) SetRefresh(w http.ResponseWriter, token string) {
 
 // SetOAuthState writes the short-lived OAuth CSRF state cookie.
 func (m *CookieManager) SetOAuthState(w http.ResponseWriter, state string) {
-	http.SetCookie(w, m.base(OAuthStateCookie, state, "/api/auth", int((10 * time.Minute).Seconds())))
+	http.SetCookie(w, m.base(OAuthStateCookie, state, "/api/auth", int((10*time.Minute).Seconds())))
 }
 
 // ClearAuth expires both auth cookies (logout).

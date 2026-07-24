@@ -44,10 +44,10 @@ type Controller struct {
 }
 
 type ATISEntry struct {
-	Callsign string   `json:"callsign"`
-	Frequency string  `json:"frequency"`
-	AtisCode string   `json:"atis_code"`
-	TextAtis []string `json:"text_atis"`
+	Callsign  string   `json:"callsign"`
+	Frequency string   `json:"frequency"`
+	AtisCode  string   `json:"atis_code"`
+	TextAtis  []string `json:"text_atis"`
 }
 
 // VatsimUser is the VATSIM Connect /api/user profile response.
